@@ -2,6 +2,9 @@
 #define ACTIONS_H
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef enum {
   OK = 0,
@@ -12,13 +15,13 @@ typedef enum {
 } StatusCode;
 
 long int StringToNumber(const char *string, char **endptr, int base);
-long long CalculateSum(long int x);
-long long Factorial(long int x);
-bool IsPrime(long int x);
-bool FlagFirstElementCheck(char element);
-void PrintMultiples(long int x);
-void PrintHexDigits(long int x);
-void PrintPowersTable(long int x);
-void PrintExceptions(StatusCode status);
+long long CalculateSum(const long int x);
+long long Factorial(const long int x);
+bool IsPrime(const long int x);
+bool FlagFirstElementCheck(const char element);
+void PrintMultiples(const long int x);
+void PrintHexDigits(const long int x);
+void PrintPowersTable(const long int x);
+void PrintExceptions(const StatusCode status);
 
 #endif

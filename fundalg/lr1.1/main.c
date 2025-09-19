@@ -1,8 +1,4 @@
 #include "actions.h"
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 int main(int argc, char *argv[]) {
 
@@ -18,7 +14,7 @@ int main(int argc, char *argv[]) {
     return UNKNOWN_FLAG;
   }
 
-  int base = 10;
+  const int base = 10;
   char *pEnd;
 
   long int number = StringToNumber(argv[1], &pEnd, base);

@@ -1,13 +1,11 @@
 #include "actions.h"
-#include <stdio.h>
-#include <stdlib.h>
 
-long long CalculateSum(long int x) {
+long long CalculateSum(const long int x) {
   long long sum = (long long)x * (x + 1) / 2;
   return sum;
 }
 
-bool IsPrime(long int x) {
+bool IsPrime(const long int x) {
   long int i = 0;
 
   if (x == 1) {
@@ -27,9 +25,9 @@ bool IsPrime(long int x) {
   return true;
 }
 
-void PrintMultiples(long int x) {
+void PrintMultiples(const long int x) {
   long int i = 0;
-  int limit = 100;
+  const int limit = 100;
   bool Flag = false;
 
   for (i = 1; i <= limit; ++i) {
@@ -45,7 +43,7 @@ void PrintMultiples(long int x) {
   return;
 }
 
-void PrintHexDigits(long int x) {
+void PrintHexDigits(const long int x) {
   int digit = 0;
   char hexChars[] = "0123456789ABCDEF";
 
@@ -61,7 +59,7 @@ void PrintHexDigits(long int x) {
   printf("%c ", hexChars[x % 16]);
 }
 
-void PrintPowersTable(long int x) {
+void PrintPowersTable(const long int x) {
   printf("%-5s", "Base");
   long long result = 0;
 
@@ -84,7 +82,7 @@ void PrintPowersTable(long int x) {
   return;
 }
 
-long long Factorial(long int x) {
+long long Factorial(const long int x) {
   long long factorial = 1;
 
   if (x == 0) {
@@ -97,7 +95,7 @@ long long Factorial(long int x) {
   return factorial;
 }
 
-bool FlagFirstElementCheck(char element) {
+bool FlagFirstElementCheck(const char element) {
   if ((element == '-') || (element == '/')) {
     return true;
   }
@@ -109,7 +107,7 @@ long int StringToNumber(const char *string, char **endptr, int base) {
   return number;
 }
 
-void PrintExceptions(StatusCode status) {
+void PrintExceptions(const StatusCode status) {
   switch (status) {
 
   case INVALID_NUMBER_OF_ARGS:
