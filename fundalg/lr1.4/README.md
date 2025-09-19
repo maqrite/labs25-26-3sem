@@ -8,4 +8,4 @@ flags:
 
 --eps <0.0001>
 
-to run ./programm --const <const> --method <method> --eps <value>
+to run ./programm --const <-> --method <-> --eps <->
