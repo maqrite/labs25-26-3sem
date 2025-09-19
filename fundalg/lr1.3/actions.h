@@ -1,3 +1,6 @@
+#ifndef ACTIONS_H
+#define ACTIONS_H
+
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
@@ -30,3 +33,5 @@ bool CheckRightTriangle(const double epsilon, const double a, const double b,
 bool IsTriangle(const double a, const double b, const double c);
 bool CheckPifagor(const double eps, const double a, const double b,
                   const double c);
+
+#endif
