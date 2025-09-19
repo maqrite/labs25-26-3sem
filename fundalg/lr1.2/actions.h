@@ -1,5 +1,9 @@
+#ifndef ACTIONS_H
+#define ACTIONS_H
+
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef enum {
   OK = 0,
@@ -11,3 +15,5 @@ typedef enum {
 void printExceptions(const StatusCode status);
 StatusCode findPrimeBasedOnSequenceNumber(const int n, long long int *answer);
 bool isPrime(const long long int n);
+
+#endif

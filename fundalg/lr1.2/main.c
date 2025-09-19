@@ -1,6 +1,4 @@
 #include "actions.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 int main() {
   const int base = 10;
