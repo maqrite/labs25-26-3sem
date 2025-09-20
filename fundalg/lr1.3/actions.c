@@ -44,6 +44,7 @@ StatusCode StringToInt(const char *string, int *value) {
   while (isspace((unsigned char)*pEnd)) {
     ++pEnd;
   }
+
   if (*pEnd != '\0') {
     return INVALID_ARGUMENT;
   }
@@ -73,6 +74,7 @@ StatusCode StringToDouble(const char *string, double *value) {
   while (isspace((unsigned char)*pEnd)) {
     ++pEnd;
   }
+
   if (*pEnd != '\0') {
     return INVALID_ARGUMENT;
   }
@@ -157,6 +159,7 @@ void SolveAndAddRoots(const double epsilon, const double a, const double b,
   SolveQuadEquation(epsilon, a, b, c, &x1, &x2, &rootsAmount);
 
   switch (rootsAmount) {
+
   case 1:
     allRoots[(*rootsCount)++] = x1;
     break;
@@ -166,13 +169,14 @@ void SolveAndAddRoots(const double epsilon, const double a, const double b,
     allRoots[(*rootsCount)++] = x2;
     break;
 
-  case 0:
+  default:
     break;
   }
 }
 
 void PrintQuadSolves(const double epsilon, const double a, const double b,
                      const double c) {
+
   double allRoots[12];
   int rootsCount = 0;
 

@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
   }
 
   else if (strcmp(flag, "-m") == 0 || strcmp(flag, "/m") == 0) {
+
     if (argc != 4) {
       PrintExceptions(INVALID_NUMBER_OF_ARGS_FOR_FLAG);
       return INVALID_NUMBER_OF_ARGS_FOR_FLAG;
@@ -84,6 +85,7 @@ int main(int argc, char *argv[]) {
   }
 
   else if (strcmp(flag, "-t") == 0 || strcmp(flag, "/t") == 0) {
+
     if (argc != 6) {
       PrintExceptions(INVALID_NUMBER_OF_ARGS_FOR_FLAG);
       return INVALID_NUMBER_OF_ARGS_FOR_FLAG;

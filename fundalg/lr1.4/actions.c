@@ -43,6 +43,7 @@ StatusCode stringToDouble(const char *string, double *value) {
   while (isspace((unsigned char)*pEnd)) {
     ++pEnd;
   }
+
   if (*pEnd != '\0') {
     return INVALID_ARGUMENT;
   }
@@ -70,6 +71,7 @@ double nlog(const double x, const double epsilon) {
     sum += currentPowerOfU / n;
     currentPowerOfU *= uSquare;
   }
+
   return 2.0 * sum;
 }
 
@@ -116,6 +118,7 @@ double calculateExpEquation(const double epsilon) {
       b = midpoint;
     }
   }
+
   return (a + b) / 2.0;
 }
 
@@ -146,6 +149,7 @@ double calculatePiLimit(const double epsilon) {
       break;
     }
   }
+
   return currentPi;
 }
 
@@ -162,6 +166,7 @@ double calculatePiSeries(const double epsilon) {
     sum += term;
     sign *= -1.0;
   }
+
   return sum * 4.0;
 }
 
@@ -178,6 +183,7 @@ double calculatePiEquation(const double epsilon) {
     }
     currentX = previousX - fx / fPrimeX;
   }
+
   return currentX;
 }
 
@@ -193,6 +199,7 @@ double calculateLn2Series(const double epsilon) {
     sum += term;
     sign *= -1.0;
   }
+
   return sum;
 }
 
@@ -203,12 +210,14 @@ double calculateLn2Equation(const double epsilon) {
   while (fabs(b - a) > epsilon) {
     double midpoint = (a + b) / 2.0;
     double fmidpoint = exp(midpoint) - 2.0;
+
     if (fmidpoint < 0) {
       a = midpoint;
     } else {
       b = midpoint;
     }
   }
+
   return (a + b) / 2.0;
 }
 
@@ -222,6 +231,7 @@ double calculateLn2Limit(const double epsilon) {
     currentResult = n * (pow(2.0, 1.0 / n) - 1.0);
     ++n;
   }
+
   return currentResult;
 }
 
@@ -231,12 +241,14 @@ double calculateSqrt2Series(const double epsilon) {
 
   while (1) {
     double term = pow(2.0, power);
+
     if (fabs(term - 1.0) < epsilon) {
       break;
     }
     prod *= term;
     power /= 2.0;
   }
+
   return prod;
 }
 
@@ -248,6 +260,7 @@ double calculateSqrt2Equation(const double epsilon) {
     previousX = currentX;
     currentX = 0.5 * (previousX + 2.0 / previousX);
   }
+
   return currentX;
 }
 
@@ -259,6 +272,7 @@ double calculateSqrt2Limit(const double epsilon) {
     previousX = currentX;
     currentX = previousX - (previousX * previousX) / 2.0 + 1.0;
   }
+
   return currentX;
 }
 
@@ -267,6 +281,7 @@ double nlogFactorial(const int x, const double epsilon) {
   for (int i = 1; i <= x; ++i) {
     sumLog += nlog((double)i, epsilon);
   }
+
   return sumLog;
 }
 
@@ -285,6 +300,7 @@ double calculateGammaSeries(const double epsilon) {
     }
     sum += term;
   }
+
   return sum;
 }
 
@@ -306,11 +322,14 @@ double calculateGammaLimit(const double epsilon) {
 
       currentSum += Cmk * sign * logKfact;
     }
+
     currentGamma = currentSum;
+
     if (m > 1 && fabs(currentGamma - previousGamma) < epsilon) {
       break;
     }
   }
+
   return currentGamma;
 }
 
@@ -321,10 +340,13 @@ bool *sieveOfEratosthenes(int limit) {
     printf("Ошибка выделения памяти для решета Эратосфена\n");
     return NULL;
   }
+
   for (int i = 0; i <= limit; ++i) {
     isPrime[i] = true;
   }
+
   isPrime[0] = isPrime[1] = false;
+
   for (int p = 2; p * p <= limit; ++p) {
     if (isPrime[p]) {
       for (int i = p * p; i <= limit; i += p) {
@@ -332,6 +354,7 @@ bool *sieveOfEratosthenes(int limit) {
       }
     }
   }
+
   return isPrime;
 }
 
@@ -343,27 +366,34 @@ double calculateMertensLimit(const double epsilon) {
   while (fabs(currentLimit - previousLimit) > epsilon) {
     previousLimit = currentLimit;
     bool *primes = sieveOfEratosthenes(t);
+
     if (primes == NULL) {
       printf("Ошибка выделения памяти для решета при вычислении предела\n");
       return NAN;
     }
+
     double prod = 1.0;
+
     for (int p = 2; p <= t; ++p) {
       if (primes[p]) {
         prod *= (1.0 - 1.0 / p);
       }
     }
+
     free(primes);
     currentLimit = nlog((double)t, epsilon) * prod;
     t = (int)(t * 1.5);
+
     if (t < 3) {
       t = 3;
     }
   }
+
   return currentLimit;
 }
 
 double calculateGammaEquation(const double epsilon) {
   double limit = calculateMertensLimit(epsilon);
+
   return -nlog(limit, epsilon);
 }
