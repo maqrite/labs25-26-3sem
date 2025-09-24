@@ -1,0 +1,6 @@
+CountVowelsTest.HandlesEmptyString 1 0.0305635
+CountVowelsTest.HandlesStringWithNoVowels 1 0.018185
+CountVowelsTest.HandlesStringWithOnlyVowels 1 0.0158108
+CountVowelsTest.HandlesStandardMixedString 1 0.0162955
+CountVowelsTest.HandlesNonLowercase 1 0.0154696
+---
