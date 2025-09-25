@@ -36,8 +36,9 @@ void PrintMultiples(const long int x) {
       printf("%ld\t", i);
     }
   }
-  printf("\n");
-  if (Flag == false) {
+  if (Flag == true) {
+    printf("\n");
+  } else {
     printf("Кратных натуральных чисел в пределах 100 нет\n");
   }
   return;
