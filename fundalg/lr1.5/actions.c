@@ -117,7 +117,7 @@ StatusCode forI(const char *input, char **output) {
     return MEMORY_ALLOC_ERROR;
   }
 
-  sprintf(*output, "%zu", latinCharCounter);
+  snprintf(*output, digits + 1, "%zu", latinCharCounter);
 
   return OK;
 }
@@ -147,7 +147,7 @@ StatusCode forS(const char *input, char **output) {
     return MEMORY_ALLOC_ERROR;
   }
 
-  sprintf(*output, "%zu", specialCharCounter);
+  snprintf(*output, digits + 1, "%zu", specialCharCounter);
 
   return OK;
 }
@@ -174,7 +174,7 @@ StatusCode forA(const char *input, char **output) {
       (*output)[j] = c;
       j++;
     } else {
-      sprintf(&((*output)[j]), "%02X", c);
+      snprintf(&((*output)[j]), 3, "%02X", c);
       j += 2;
     }
   }
