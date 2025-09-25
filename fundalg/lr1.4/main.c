@@ -18,15 +18,19 @@ int main(int argc, char *argv[]) {
   }
 
   for (int i = 1; i < argc; ++i) {
+
     if (strcmp(argv[i], "--const") == 0) {
+
       if (i + 1 < argc) {
         input.constName = argv[i + 1];
         input.constProvided = true;
         ++i;
       } else {
         printExceptions(FLAG_ERROR);
+
         return FLAG_ERROR;
       }
+
     } else if (strcmp(argv[i], "--method") == 0) {
       if (i + 1 < argc) {
         input.methodName = argv[i + 1];
@@ -34,6 +38,7 @@ int main(int argc, char *argv[]) {
         ++i;
       } else {
         printExceptions(FLAG_ERROR);
+
         return FLAG_ERROR;
       }
     }
@@ -43,6 +48,7 @@ int main(int argc, char *argv[]) {
         StatusCode status = stringToDouble(argv[i + 1], &input.epsilon);
         if (status != OK) {
           printExceptions(FLAG_ERROR);
+
           return FLAG_ERROR;
         }
         input.epsilonProvided = true;
