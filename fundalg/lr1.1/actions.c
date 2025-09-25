@@ -44,7 +44,6 @@ void PrintMultiples(const long int x) {
 }
 
 void PrintHexDigits(const long int x) {
-  int digit = 0;
   char hexChars[] = "0123456789ABCDEF";
 
   if (x == 0) {
