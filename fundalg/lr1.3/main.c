@@ -10,6 +10,7 @@ int main(int argc, char *argv[]) {
   char *flag = argv[1];
 
   if (strcmp(flag, "-q") == 0 || strcmp(flag, "/q") == 0) {
+
     if (argc != 6) {
       PrintExceptions(INVALID_NUMBER_OF_ARGS_FOR_FLAG);
       return INVALID_NUMBER_OF_ARGS_FOR_FLAG;

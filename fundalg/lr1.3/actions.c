@@ -88,6 +88,7 @@ bool CheckMultiplicity(const int number1, const int number2) {
   if (number2 == 0) {
     return false;
   }
+
   return (number1 % number2 == 0);
 }
 
@@ -100,6 +101,7 @@ bool CheckPifagor(const double eps, const double a, const double b,
   bool check1 = fabs(a * a + b * b - c * c) < eps;
   bool check2 = fabs(a * a + c * c - b * b) < eps;
   bool check3 = fabs(b * b + c * c - a * a) < eps;
+
   return check1 || check2 || check3;
 }
 
@@ -195,20 +197,25 @@ void PrintQuadSolves(const double epsilon, const double a, const double b,
     for (int j = 0; j < uniqueCount; ++j) {
       if (fabs(allRoots[i] - uniqueRoots[j]) < epsilon) {
         isDuplicate = true;
+
         break;
       }
     }
+
     if (!isDuplicate) {
       uniqueRoots[uniqueCount++] = allRoots[i];
     }
   }
+
   if (uniqueCount == 0) {
     printf("Действительных корней не найдено ни для одной перестановки\n");
   } else {
     printf("Уникальные корни для всех перестановок:\n");
+
     for (int i = 0; i < uniqueCount; ++i) {
       printf("x%d = %f\n", i + 1, uniqueRoots[i]);
     }
   }
+
   return;
 }
