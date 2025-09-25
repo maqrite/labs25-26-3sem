@@ -1,6 +1,6 @@
 #include "actions.h"
 
-int main() {
+int main(void) {
   const int base = 10;
   char buffer[50];
   int t;
