@@ -11,16 +11,20 @@ int main(void) {
 
     if (pEnd == buffer || (*pEnd != '\0' && *pEnd != '\n') || value < 0) {
       printExceptions(INCORRECT_NUMBER_OF_STRINGS);
+
       return INCORRECT_NUMBER_OF_STRINGS;
     }
 
     t = (int)value;
+
   } else {
     printExceptions(STRING_READ_ERROR);
+
     return STRING_READ_ERROR;
   }
 
   for (int i = 0; i < t; ++i) {
+
     if (fgets(buffer, sizeof(buffer), stdin)) {
 
       char *pEnd;
@@ -28,6 +32,7 @@ int main(void) {
 
       if (pEnd == buffer || (*pEnd != '\0' && *pEnd != '\n') || valueTwo < 0) {
         printExceptions(INCORRECT_NUMBER_IN_STRING);
+
         continue;
       }
 
@@ -37,11 +42,14 @@ int main(void) {
 
       if (status == OK) {
         printf("%lld\n", answer);
+
       } else {
         printExceptions(status);
+
         continue;
       }
     }
   }
+
   return OK;
 }
