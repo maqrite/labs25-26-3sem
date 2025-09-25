@@ -11,6 +11,6 @@ s - series / e - equation / l - limit
 
 для внутренних тестов "make internal_tests"
 
-для компиляции "gcc -Wall -Werror -Wextra -Wpedantic -fsanitize=address -lm main.c actions.c -o program"
+для компиляции "gcc -Wall -Werror -Wextra -Wpedantic -fsanitize=address main.c actions.c -o program -lm"
 
 для запуска ./program --const exp --method s --eps 0.001
