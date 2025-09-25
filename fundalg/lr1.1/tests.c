@@ -20,10 +20,10 @@ int main() {
 
 void test_CalculateSum() {
   printf("Running tests for CalculateSum...\n");
-  assert(CalculateSum(1) == 1);      // Сумма до 1
-  assert(CalculateSum(5) == 15);     // Сумма до 5 (1+2+3+4+5)
-  assert(CalculateSum(10) == 55);    // Сумма до 10
-  assert(CalculateSum(100) == 5050); // Сумма до 100
+  assert(CalculateSum(1) == 1);
+  assert(CalculateSum(5) == 15);
+  assert(CalculateSum(10) == 55);
+  assert(CalculateSum(100) == 5050);
 }
 
 void test_IsPrime() {
