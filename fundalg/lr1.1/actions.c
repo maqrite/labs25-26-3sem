@@ -2,6 +2,7 @@
 
 long long CalculateSum(const long int x) {
   long long sum = (long long)x * (x + 1) / 2;
+
   return sum;
 }
 
@@ -11,17 +12,21 @@ bool IsPrime(const long int x) {
   if (x == 1) {
     return false;
   }
+
   if (x <= 3) {
     return true;
   }
+
   if (x % 2 == 0 || x % 3 == 0) {
     return false;
   }
+
   for (i = 5; i * i <= x; i = i + 6) {
     if (x % i == 0 || x % (i + 2) == 0) {
       return false;
     }
   }
+
   return true;
 }
 
@@ -36,11 +41,13 @@ void PrintMultiples(const long int x) {
       printf("%ld\t", i);
     }
   }
+
   if (Flag == true) {
     printf("\n");
   } else {
     printf("Кратных натуральных чисел в пределах 100 нет\n");
   }
+
   return;
 }
 
@@ -79,6 +86,7 @@ void PrintPowersTable(const long int x) {
     }
     printf("\n");
   }
+
   return;
 }
 
@@ -92,6 +100,7 @@ long long Factorial(const long int x) {
   for (int i = 1; i <= x; ++i) {
     factorial *= i;
   }
+
   return factorial;
 }
 
@@ -99,11 +108,13 @@ bool FlagFirstElementCheck(const char element) {
   if ((element == '-') || (element == '/')) {
     return true;
   }
+
   return false;
 }
 
 long int StringToNumber(const char *string, char **endptr, int base) {
   long int number = strtol(string, endptr, base);
+
   return number;
 }
 
