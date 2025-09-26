@@ -42,10 +42,10 @@ int main(int argc, char *argv[]) {
   } else if (strcmp(argv[2], "-p") == 0 || strcmp(argv[2], "/p") == 0) {
 
     if (IsPrime(number)) {
-      printf("Число %ld является простым\n", number);
+      printf("%ld is simple\n", number);
 
     } else {
-      printf("Число %ld является составным\n", number);
+      printf("%ld not simple\n", number);
     }
   } else if (strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "/h") == 0) {
     PrintMultiples(number);
