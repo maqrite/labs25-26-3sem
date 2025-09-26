@@ -4,7 +4,7 @@ int main(void) {
   const int base = 10;
   char buffer[50];
   int t;
-
+  printf("Введите кол-во запросов\n");
   if (fgets(buffer, sizeof(buffer), stdin)) {
     char *pEnd;
     long int value = strtol(buffer, &pEnd, base);
@@ -26,7 +26,6 @@ int main(void) {
   for (int i = 0; i < t; ++i) {
 
     if (fgets(buffer, sizeof(buffer), stdin)) {
-
       char *pEnd;
       long valueTwo = strtol(buffer, &pEnd, base);
 
@@ -41,7 +40,7 @@ int main(void) {
       StatusCode status = findPrimeBasedOnSequenceNumber(n, &answer);
 
       if (status == OK) {
-        printf("%lld\n", answer);
+        printf("%d-ое простое число: %lld\n", n, answer);
 
       } else {
         printExceptions(status);
