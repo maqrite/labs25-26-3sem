@@ -45,7 +45,7 @@ void PrintMultiples(const long int x) {
   if (Flag == true) {
     printf("\n");
   } else {
-    printf("Кратных натуральных чисел в пределах 100 нет\n");
+    printf("There are no multiples of natural numbers within 100\n");
   }
 
   return;
@@ -122,19 +122,19 @@ void PrintExceptions(const StatusCode status) {
   switch (status) {
 
   case INVALID_NUMBER_OF_ARGS:
-    printf("Недопустимое количество аргументов\n");
+    printf("Invalid number of arguments\n");
     break;
 
   case UNKNOWN_FLAG:
-    printf("Неизвестный флаг\n");
+    printf("Unknown flag\n");
     break;
 
   case INCORRECT_NUMBER:
-    printf("Некорректное число\n");
+    printf("Incorrect number\n");
     break;
 
   case INCORRECT_NUMBER_FOR_FLAG:
-    printf("Некорректное число для выбранного флага\n");
+    printf("Invalid number for the selected flag\n");
     break;
 
   default:
