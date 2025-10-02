@@ -22,12 +22,20 @@ void PrintErrors(StatusCode status) {
     printf("число слишком велико\n");
     break;
 
+  case NULL_POINTER_ERROR:
+    printf("в функцию был передан нулевой указатель.\n");
+    break;
+
   default:
     break;
   }
 }
 
 StatusCode getDigitValue(char c, int *out_value) {
+  if (out_value == NULL) {
+    return NULL_POINTER_ERROR;
+  }
+
   c = tolower(c);
   if (c >= '0' && c <= '9') {
     *out_value = c - '0';
@@ -44,6 +52,11 @@ StatusCode getDigitValue(char c, int *out_value) {
 
 StatusCode processNumber(const char *numberStr, int *outBase,
                          unsigned long long *outValue) {
+
+  if (numberStr == NULL || outBase == NULL || outValue == NULL) {
+    return NULL_POINTER_ERROR;
+  }
+
   int maxDigit = 0;
 
   for (int i = 0; numberStr[i] != '\0'; ++i) {
@@ -89,6 +102,10 @@ StatusCode processNumber(const char *numberStr, int *outBase,
 }
 
 StatusCode processFiles(const char *inputPath, const char *outputPath) {
+
+  if (inputPath == NULL || outputPath == NULL) {
+    return NULL_POINTER_ERROR;
+  }
 
   FILE *inputFile = fopen(inputPath, "r");
   if (inputFile == NULL) {

@@ -12,6 +12,7 @@ typedef enum {
   INVALID_NUMBER_OF_ARGS = 3,
   INVALID_CHARACTER_IN_NUMBER = 4,
   NUMBER_OVERFLOW = 5,
+  NULL_POINTER_ERROR = 6,
 
 } StatusCode;
 
