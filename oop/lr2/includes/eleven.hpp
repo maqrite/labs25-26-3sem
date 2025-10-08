@@ -1,8 +1,12 @@
 #ifndef ELEVEN_HPP
 #define ELEVEN_HPP
 
+#include <exception>
+#include <initializer_list>
 #include <iostream>
+#include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 class Eleven {
@@ -13,9 +17,16 @@ private:
 
 public:
   Eleven();
+
+  Eleven(size_t n, unsigned char t);
+
+  Eleven(const std::initializer_list<unsigned char> &t);
+
   Eleven(const std::string &s);
+
   Eleven(const Eleven &other);
-  ~Eleven();
+
+  virtual ~Eleven();
 
   Eleven add(const Eleven &other) const;
   Eleven subtract(const Eleven &other) const;

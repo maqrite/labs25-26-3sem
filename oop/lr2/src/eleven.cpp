@@ -1,7 +1,9 @@
 #include "../includes/eleven.hpp"
 #include <cstddef>
+#include <initializer_list>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 void Eleven::trim() {
   while (this->digits.size() > 1 && this->digits.back() == 0) {
@@ -10,6 +12,34 @@ void Eleven::trim() {
 }
 
 Eleven::Eleven() { this->digits.push_back(0); }
+
+Eleven::Eleven(size_t n, unsigned char t) {
+  if (t > 10) {
+    throw std::invalid_argument("digit can't be greater than 10");
+  }
+  if (n == 0) {
+    this->digits.push_back(0);
+  } else {
+    this->digits = std::vector<unsigned char>(n, t);
+  }
+  this->trim();
+}
+
+Eleven::Eleven(const std::initializer_list<unsigned char> &t) {
+  if (t.size() == 0) {
+    this->digits.push_back(0);
+    return;
+  }
+
+  this->digits = std::vector<unsigned char>(t);
+
+  for (unsigned char digit : this->digits) {
+    if (digit > 10) {
+      throw std::invalid_argument("digit can't be greater than 10");
+    }
+  }
+  this->trim();
+}
 
 Eleven::Eleven(const std::string &s) {
   if (s.empty()) {
