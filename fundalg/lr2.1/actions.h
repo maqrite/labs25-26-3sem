@@ -17,7 +17,7 @@ typedef enum {
 void printErrors(StatusCode status);
 void demonstrateFunction(void);
 
-bool hasFinReprImpl(double fraction, const int base, const double epsilon);
+bool hasFinReprImpl(double fraction, const int base);
 StatusCode checkFinRepres(bool results[], const int base, int count, ...);
 
 #endif
