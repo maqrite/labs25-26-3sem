@@ -1,9 +1,6 @@
 #include "actions.h"
 #include <stdbool.h>
 
-#define maxIterations 100
-#define defaultEpsilon 0.000000001
-
 void printErrors(StatusCode status) {
   switch (status) {
   case INVALID_NUMBER_OF_ARGS:
