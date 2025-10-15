@@ -1,6 +1,6 @@
 #include "actions.h"
 
-int main() {
-  // dadsasffaaf
+int main(void) {
+  testAllFlags();
   return OK;
 }

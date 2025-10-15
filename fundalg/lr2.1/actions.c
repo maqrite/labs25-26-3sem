@@ -95,7 +95,7 @@ StatusCode checkFinRepres(bool *results, const int base, int count, ...) {
 }
 
 void demonstrateFunction(void) {
-  int base1 = 10;
+  int base1 = 2;
   double d11 = 0.5;
   double d12 = 0.125;
   double d13 = 1.0 / 3.0;

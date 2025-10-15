@@ -1,6 +1,7 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
+#include <limits.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -29,4 +30,7 @@ StatusCode convertToBase(long long num, int base, bool uppercase,
 int getCharValue(char c);
 StatusCode convertFromBase(const char *numStr, int base, long long *result);
 
+StatusCode dumpMemory(const void *data, size_t size, char **resultStr);
+
+void testAllFlags(void);
 #endif

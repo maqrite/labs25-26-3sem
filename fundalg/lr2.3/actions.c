@@ -1,7 +1,4 @@
 #include "actions.h"
-#include <ios>
-#include <stdarg.h>
-#include <string.h>
 
 void printErrors(StatusCode status) {
   switch (status) {
@@ -28,8 +25,8 @@ StatusCode convertToRoman(int num, char **resultStr) {
   }
 
   int values[] = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
-  char *symbols[] = {"M",  "CM", "D", "CD", "C", "XC", "L",
-                     "XL", "L",  "X", "IX", "V", "IV", "I"};
+  char *symbols[] = {"M",  "CM", "D",  "CD", "C",  "XC", "L",
+                     "XL", "X",  "IX", "V",  "IV", "I"};
 
   *resultStr = (char *)malloc(16 * sizeof(char));
 
@@ -39,7 +36,7 @@ StatusCode convertToRoman(int num, char **resultStr) {
 
   (*resultStr)[0] = '\0';
 
-  for (int i = 0; i < 23; i++) {
+  for (int i = 0; i < 13; i++) {
     while (num >= values[i]) {
       strcat(*resultStr, symbols[i]);
       num -= values[i];
@@ -62,40 +59,42 @@ StatusCode zeckendorfRepr(unsigned int n, char **resultStr) {
   unsigned int fib[50];
   fib[0] = 0;
   fib[1] = 1;
-  unsigned int *pCurr = &fib[2];
-  unsigned int *pPrev1 = &fib[1];
-  unsigned int *pPrev2 = &fib[0];
+  int maxFibIndex = 0;
 
-  while (*pPrev1 <= n) {
-    *pCurr = *pPrev1 + *pPrev2;
+  for (int i = 2; i < 50; i++) {
+    if (fib[i - 1] > UINT_MAX - fib[i - 2]) {
+      maxFibIndex = i - 1;
+      break;
+    }
 
-    pCurr++;
-    pPrev1++;
-    pPrev2++;
+    fib[i] = fib[i - 1] + fib[i - 2];
+
+    if (fib[i] > n) {
+      maxFibIndex = i - 1;
+      break;
+    }
   }
 
-  int maxFibIndex = pPrev2 - fib;
+  *resultStr = (char *)malloc((maxFibIndex + 1) * sizeof(char));
+  if (!*resultStr) {
+    return MEMORY_ALLOCATION_ERROR;
+  }
 
-  *resultStr = (char *)malloc((maxFibIndex + 2) * sizeof(char));
-
-  for (int k = 0; k < maxFibIndex; k++) {
+  for (int k = 0; k < maxFibIndex - 1; k++) {
     (*resultStr)[k] = '0';
   }
 
   unsigned int tempN = n;
-  char *pRes = (*resultStr) + (maxFibIndex - 2);
 
   for (int k = maxFibIndex; k >= 2; k--) {
     if (tempN >= fib[k]) {
       tempN -= fib[k];
-      *pRes = '1';
+      (*resultStr)[k - 2] = '1';
     }
-    pRes--;
   }
 
-  char *pStart = *resultStr;
-  pStart[maxFibIndex - 1] = '1';
-  pStart[maxFibIndex] = '\0';
+  (*resultStr)[maxFibIndex - 1] = '1';
+  (*resultStr)[maxFibIndex] = '\0';
 
   return OK;
 }
@@ -107,6 +106,7 @@ void reverseString(char *str) {
   while (left < right) {
     char temp = str[left];
     str[left] = str[right];
+    str[right] = temp;
     left++;
     right--;
   }
@@ -214,6 +214,34 @@ StatusCode convertFromBase(const char *numStr, int base, long long *result) {
   return OK;
 }
 
+StatusCode dumpMemory(const void *data, size_t size, char **resultStr) {
+  size_t requiredLen = size * 9;
+  *resultStr = (char *)malloc(requiredLen);
+  if (!*resultStr) {
+    return MEMORY_ALLOCATION_ERROR;
+  }
+
+  const unsigned char *bytes = (const unsigned char *)data;
+  char *pRes = *resultStr;
+
+  for (size_t i = 0; i < size; i++) {
+    unsigned char currentByte = bytes[i];
+
+    for (int j = 7; j >= 0; j--) {
+      *pRes = ((currentByte >> j) & 1) ? '1' : '0';
+      pRes++;
+    }
+
+    if (i < size - 1) {
+      *pRes = ' ';
+      pRes++;
+    }
+  }
+  *pRes = '\0';
+
+  return OK;
+}
+
 int oversprintf(char *str, const char *format, ...) {
   va_list args;
   va_start(args, format);
@@ -291,6 +319,9 @@ int oversprintf(char *str, const char *format, ...) {
           free(resultS);
         }
 
+        break;
+      }
+
       case 't':
       case 'T': {
         if (*(format + 1) == 'o' || *(format + 1) == 'O') {
@@ -317,7 +348,67 @@ int oversprintf(char *str, const char *format, ...) {
         break;
       }
 
-      break;
+      case 'm': {
+        void *ptr = NULL;
+        size_t dataSize = 0;
+
+        int iVal;
+        unsigned int uVal;
+        double dVal;
+        float fVal;
+
+        switch (*(format + 1)) {
+
+        case 'i': {
+          iVal = va_arg(args, int);
+          ptr = &iVal;
+          dataSize = sizeof(int);
+          format++;
+          break;
+        }
+
+        case 'u': {
+          uVal = va_arg(args, unsigned int);
+          ptr = &uVal;
+          dataSize = sizeof(unsigned int);
+          format++;
+          break;
+        }
+
+        case 'd': {
+          dVal = va_arg(args, double);
+          ptr = &dVal;
+          dataSize = sizeof(double);
+          format++;
+          break;
+        }
+
+        case 'f': {
+          fVal = (float)va_arg(args, double);
+          ptr = &fVal;
+          dataSize = sizeof(float);
+          format++;
+          break;
+        }
+        }
+
+        if (ptr) {
+          char *dumpStr = NULL;
+          status = dumpMemory(ptr, dataSize, &dumpStr);
+          if (status != OK) {
+            va_end(args);
+            return -1;
+          }
+
+          strcpy(pStr, dumpStr);
+          int len = strlen(dumpStr);
+          pStr += len;
+          totalWritten += len;
+
+          free(dumpStr);
+        }
+
+        break;
       }
 
       case '%':
@@ -331,7 +422,6 @@ int oversprintf(char *str, const char *format, ...) {
         totalWritten += 2;
         break;
       }
-
     } else {
       *pStr++ = *format;
       totalWritten++;
@@ -350,7 +440,6 @@ int overfprintf(FILE *stream, const char *format, ...) {
   va_list args;
   va_start(args, format);
 
-  int writtenChars = 0;
   int totalWritten = 0;
   StatusCode status;
 
@@ -381,7 +470,7 @@ int overfprintf(FILE *stream, const char *format, ...) {
         break;
 
       case 'Z':
-        if (*(format - 1) == 'r') {
+        if (*(format + 1) == 'r') {
           format++;
           unsigned int num = va_arg(args, unsigned int);
           char *zeckStr = NULL;
@@ -433,15 +522,76 @@ int overfprintf(FILE *stream, const char *format, ...) {
             return -1;
           }
 
-          fprintf(stream, "%lld", decRes);
-
-          char tempBuffer[65];
-          totalWritten +=
-              snprintf(tempBuffer, sizeof(tempBuffer), "%lld", decRes);
+          int writtenNow = fprintf(stream, "%lld", decRes);
+          if (writtenNow > 0) {
+            totalWritten += writtenNow;
+          }
         }
 
         break;
       }
+
+      case 'm': {
+        void *ptr = NULL;
+        size_t dataSize = 0;
+
+        int iVal;
+        unsigned int uVal;
+        double dVal;
+        float fVal;
+
+        switch (*(format + 1)) {
+
+        case 'i': {
+          iVal = va_arg(args, int);
+          ptr = &iVal;
+          dataSize = sizeof(int);
+          format++;
+          break;
+        }
+
+        case 'u': {
+          uVal = va_arg(args, unsigned int);
+          ptr = &uVal;
+          dataSize = sizeof(unsigned int);
+          format++;
+          break;
+        }
+
+        case 'd': {
+          dVal = va_arg(args, double);
+          ptr = &dVal;
+          dataSize = sizeof(double);
+          format++;
+          break;
+        }
+
+        case 'f': {
+          fVal = (float)va_arg(args, double);
+          ptr = &fVal;
+          dataSize = sizeof(float);
+          format++;
+          break;
+        }
+        }
+
+        if (ptr) {
+          char *dumpStr = NULL;
+          status = dumpMemory(ptr, dataSize, &dumpStr);
+          if (status != OK) {
+            va_end(args);
+            return -1;
+          }
+
+          fputs(dumpStr, stream);
+          totalWritten += strlen(dumpStr);
+
+          free(dumpStr);
+        }
+
+        break;
+      }
+
       case '%':
         fputc('%', stream);
         totalWritten++;
@@ -464,4 +614,62 @@ int overfprintf(FILE *stream, const char *format, ...) {
   return totalWritten;
 }
 
-// mi, mo, ..........
+void testAllFlags(void) {
+  char buffer[1024];
+  printf("========= НАЧАЛО ТЕСТИРОВАНИЯ ФУНКЦИЙ =========\n\n");
+
+  printf("--- Тест %%Ro ---\n");
+  overfprintf(stdout, "Число 1999 -> %Ro\n", 1999);
+  oversprintf(buffer, "Число 42 -> %Ro | Число 3999 -> %Ro", 42, 3999);
+  printf("%s\n\n", buffer);
+
+  printf("--- Тест %%Zr ---\n");
+  overfprintf(stdout, "Число 17 -> %Zr\n",
+              17); // 13+3+1 = F_7+F_4+F_2 -> 1010011
+  oversprintf(buffer, "Число 100 -> %Zr | Число 0 -> %Zr", 100, 0);
+  printf("%s\n\n", buffer);
+
+  printf("--- Тест %%Cv и %%CV ---\n");
+  overfprintf(stdout, "Число 255 (base 16, low): %Cv\n", 255, 16);
+  overfprintf(stdout, "Число 255 (base 16, up): %CV\n", 255, 16);
+  overfprintf(stdout, "Число -42 (base 2): %Cv\n", -42, 2);
+  oversprintf(buffer, "Число 12345 (base 36, up): %CV", 12345, 36);
+  printf("%s\n\n", buffer);
+
+  printf("--- Тест %%to и %%TO ---\n");
+  overfprintf(stdout, "Строка 'ff' (base 16) -> %to\n", "ff", 16);
+  oversprintf(buffer,
+              "Строка 'FF' (base 16) -> %TO | Строка '-101010' (base 2) -> %to",
+              "FF", 16, "-101010", 2);
+  printf("%s\n\n", buffer);
+
+  printf("--- Тест дампов памяти ---\n");
+  int signed_int = -1;
+  unsigned int unsigned_int = 255;
+  double dbl = 3.14;
+  float flt = 1.0f / 3.0f;
+  overfprintf(stdout, "int (-1): %mi\n", signed_int);
+  overfprintf(stdout, "uint (255): %mu\n", unsigned_int);
+  overfprintf(stdout, "double (3.14): %md\n", dbl);
+  overfprintf(stdout, "float (1/3): %mf\n\n", flt);
+
+  printf("--- Тест некорректных и граничных случаев ---\n");
+
+  overfprintf(stdout, "Неизвестный флаг %%Qx -> %Qx\n");
+
+  overfprintf(stdout, "Неполный флаг %%R -> %R\n");
+
+  int res = overfprintf(stdout, "Строка 'gg' (base 16) -> %to\n", "gg", 16);
+  if (res == -1) {
+    printf("Функция %%to вернула ошибку, как и ожидалось.\n");
+  }
+
+  res = overfprintf(stdout, "Число 4000 -> %Ro\n", 4000);
+  if (res == -1) {
+    printf("Функция %%Ro вернула ошибку, как и ожидалось.\n");
+  }
+
+  overfprintf(stdout, "Число 123 (base 99) -> %Cv\n", 123, 99);
+
+  printf("\n========= ТЕСТИРОВАНИЕ ЗАВЕРШЕНО =========\n");
+}
