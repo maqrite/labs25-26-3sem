@@ -4,10 +4,10 @@
 
 #define defaultEpsilon 0.000000001
 
-void test_hasFinReprImpl();
-void test_checkFinRepres();
+void test_hasFinReprImpl(void);
+void test_checkFinRepres(void);
 
-int main() {
+int main(void) {
   test_hasFinReprImpl();
   test_checkFinRepres();
 
@@ -15,7 +15,7 @@ int main() {
   return 0;
 }
 
-void test_hasFinReprImpl() {
+void test_hasFinReprImpl(void) {
   printf("Running tests for hasFinReprImpl...\n");
 
   assert(hasFinReprImpl(0.5, 2, defaultEpsilon) == true);
@@ -27,7 +27,7 @@ void test_hasFinReprImpl() {
   assert(hasFinReprImpl(1.0 / 5.0, 6, defaultEpsilon) == false);
 }
 
-void test_checkFinRepres() {
+void test_checkFinRepres(void) {
   printf("Running tests for checkFinRepres...\n");
   StatusCode status;
   int count = 3;
