@@ -2,6 +2,7 @@
 #define ACTIONS_H
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +21,12 @@ int oversprintf(char *str, const char *format, ...);
 
 StatusCode convertToRoman(int num, char **resultStr);
 StatusCode zeckendorfRepr(unsigned int n, char **resultStr);
-StatusCode convert_to_base(long long num, int base, bool uppercase,
-                           char **result_str);
+
+void reverseString(char *str);
+StatusCode convertToBase(long long num, int base, bool uppercase,
+                         char **resultStr);
+
+int getCharValue(char c);
+StatusCode convertFromBase(const char *numStr, int base, long long *result);
 
 #endif

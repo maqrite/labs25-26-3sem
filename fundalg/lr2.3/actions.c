@@ -1,4 +1,6 @@
 #include "actions.h"
+#include <ios>
+#include <stdarg.h>
 #include <string.h>
 
 void printErrors(StatusCode status) {
@@ -98,6 +100,120 @@ StatusCode zeckendorfRepr(unsigned int n, char **resultStr) {
   return OK;
 }
 
+void reverseString(char *str) {
+  int left = 0;
+  int right = strlen(str) - 1;
+
+  while (left < right) {
+    char temp = str[left];
+    str[left] = str[right];
+    left++;
+    right--;
+  }
+}
+
+StatusCode convertToBase(long long num, int base, bool uppercase,
+                         char **resultStr) {
+  if (base < 2 || base > 36) {
+    base = 10;
+  }
+
+  char buffer[65] = {0};
+  int i = 0;
+  bool isNegative = num < 0;
+
+  if (num == 0) {
+    *resultStr = (char *)malloc(2 * sizeof(char));
+    if (!*resultStr) {
+      return MEMORY_ALLOCATION_ERROR;
+    }
+
+    strcpy(*resultStr, "0");
+
+    return OK;
+  }
+
+  unsigned long long n = isNegative ? -num : num;
+
+  const char uppercaseStr[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const char lowercaseStr[] = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+  const char *digits = uppercase ? uppercaseStr : lowercaseStr;
+
+  while (n > 0) {
+    unsigned long long temp = n % base;
+    buffer[i] = digits[temp];
+    n /= base;
+    i++;
+  }
+
+  if (isNegative) {
+    buffer[i] = '-';
+    i++;
+  }
+
+  buffer[i] = '\0';
+
+  reverseString(buffer);
+
+  *resultStr = (char *)malloc((strlen(buffer) + 1) * sizeof(char));
+  if (!*resultStr) {
+    return MEMORY_ALLOCATION_ERROR;
+  }
+
+  strcpy(*resultStr, buffer);
+
+  return OK;
+}
+
+int getCharValue(char c) {
+  if (c >= '0' && c <= '9') {
+    return c - '0';
+  }
+
+  if (c >= 'a' && c <= 'z') {
+    return c - 'a' + 10;
+  }
+
+  if (c >= 'A' && c <= 'Z') {
+    return c - 'A' + 10;
+  }
+
+  return -1;
+}
+
+StatusCode convertFromBase(const char *numStr, int base, long long *result) {
+  if (base < 2 || base > 36) {
+    base = 10;
+  }
+
+  long long res = 0;
+  long long power = 1;
+  bool isNegative = false;
+  int startIndex = 0;
+  int len = strlen(numStr);
+
+  if (len > 0 && numStr[0] == '-') {
+    isNegative = true;
+    startIndex = 1;
+  }
+
+  for (int i = len - 1; i >= startIndex; i--) {
+    int val = getCharValue(numStr[i]);
+
+    if (val < 0 || val >= base) {
+      return INVALID_PARAMETER;
+    }
+
+    res += val * power;
+    power *= base;
+  }
+
+  *result = isNegative ? -res : res;
+
+  return OK;
+}
+
 int oversprintf(char *str, const char *format, ...) {
   va_list args;
   va_start(args, format);
@@ -153,6 +269,56 @@ int oversprintf(char *str, const char *format, ...) {
           free(zeckStr);
         }
         break;
+
+      case 'C': {
+        bool isUpper = (*(format + 1) == 'V');
+        if (isUpper || (*(format + 1) == 'v')) {
+          format++;
+          int number = va_arg(args, int);
+          int base = va_arg(args, int);
+          char *resultS = NULL;
+
+          status = convertToBase(number, base, isUpper, &resultS);
+          if (status != OK) {
+            va_end(args);
+            return -1;
+          }
+
+          strcpy(pStr, resultS);
+          writtenChars = strlen(resultS);
+          pStr += writtenChars;
+          totalWritten += writtenChars;
+          free(resultS);
+        }
+
+      case 't':
+      case 'T': {
+        if (*(format + 1) == 'o' || *(format + 1) == 'O') {
+          format++;
+          char *strNum = va_arg(args, char *);
+          int base = va_arg(args, int);
+          long long decRes = 0;
+
+          status = convertFromBase(strNum, base, &decRes);
+          if (status != OK) {
+            va_end(args);
+            return -1;
+          }
+
+          char tempBuffer[65];
+
+          writtenChars =
+              snprintf(tempBuffer, sizeof(tempBuffer), "%lld", decRes);
+
+          strcpy(pStr, tempBuffer);
+          pStr += writtenChars;
+          totalWritten += writtenChars;
+        }
+        break;
+      }
+
+      break;
+      }
 
       case '%':
         *pStr++ = '%';
@@ -232,6 +398,50 @@ int overfprintf(FILE *stream, const char *format, ...) {
         }
         break;
 
+      case 'C': {
+        bool isUpper = (*(format + 1) == 'V');
+        if (isUpper || (*(format + 1) == 'v')) {
+          format++;
+          int number = va_arg(args, int);
+          int base = va_arg(args, int);
+          char *resultS = NULL;
+
+          status = convertToBase(number, base, isUpper, &resultS);
+          if (status != OK) {
+            va_end(args);
+            return -1;
+          }
+
+          fputs(resultS, stream);
+          totalWritten += strlen(resultS);
+          free(resultS);
+        }
+        break;
+      }
+
+      case 't':
+      case 'T': {
+        if (*(format + 1) == 'o' || *(format + 1) == 'O') {
+          format++;
+          char *strNum = va_arg(args, char *);
+          int base = va_arg(args, int);
+          long long decRes;
+
+          status = convertFromBase(strNum, base, &decRes);
+          if (status != OK) {
+            va_end(args);
+            return -1;
+          }
+
+          fprintf(stream, "%lld", decRes);
+
+          char tempBuffer[65];
+          totalWritten +=
+              snprintf(tempBuffer, sizeof(tempBuffer), "%lld", decRes);
+        }
+
+        break;
+      }
       case '%':
         fputc('%', stream);
         totalWritten++;
@@ -254,4 +464,4 @@ int overfprintf(FILE *stream, const char *format, ...) {
   return totalWritten;
 }
 
-// convert to base......
+// mi, mo, ..........
