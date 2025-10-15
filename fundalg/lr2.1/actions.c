@@ -38,12 +38,13 @@ bool hasFinReprImpl(double fraction, const int base) {
   const long long maxDenominator = 1000000000000000LL;
   long long denominator = 1;
 
-  while (fabs(fraction * denominator - round(fraction * denominator)) > 1e-9 &&
+  while (fabs(fraction * denominator - (long long)(fraction * denominator)) >
+             1e-9 &&
          denominator < maxDenominator) {
     denominator *= 10;
   }
 
-  long long numerator = (long long)round(fraction * denominator);
+  long long numerator = (long long)(fraction * denominator);
 
   if (numerator == 0) {
     return true;
