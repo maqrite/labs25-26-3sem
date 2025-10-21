@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 typedef struct {
   long int roundsToRun;
@@ -96,7 +97,6 @@ int main(int argc, char *argv[]) {
 
     if (pthread_create(&threads[i], NULL, monteCarloThread, &threadArgs[i]) !=
         0) {
-      perror("не удалось создать поток");
       return -4;
     }
   }
@@ -107,7 +107,6 @@ int main(int argc, char *argv[]) {
     void *threadResult;
 
     if (pthread_join(threads[i], &threadResult) != 0) {
-      perror("не удалось дождаться завершения потока");
       return -5;
     }
 
@@ -123,9 +122,17 @@ int main(int argc, char *argv[]) {
                        (end.tv_nsec - start.tv_nsec) / 1000000.0;
   double probability = (double)totalSuccessCount / totalRounds;
 
-  printf("кол-во успешных нахождений: %ld\nвероятность: %f\nвремя выполнения: "
-         "%fms\n",
-         totalSuccessCount, probability * 100, timeSpentMs);
+  char buffer[256];
+  int len = 0;
+
+  len += snprintf(buffer + len, sizeof(buffer) - len,
+                  "кол-во успешных нахождений: %ld\n", totalSuccessCount);
+  len += snprintf(buffer + len, sizeof(buffer) - len, "вероятность: %f\n",
+                  probability * 100);
+  len += snprintf(buffer + len, sizeof(buffer) - len,
+                  "время выполнения: %fms\n", timeSpentMs);
+
+  write(STDOUT_FILENO, buffer, len);
 
   return 0;
 }

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 void deckInit(int *deck) {
   int cardIndex = 0;
@@ -63,9 +64,17 @@ int main(int argc, char *argv[]) {
 
   double probability = (double)successCount / totalRounds;
 
-  printf("кол-во успешных нахождений: %ld\nвероятность: %f\nвремя выполнения: "
-         "%fms",
-         successCount, probability * 100, timeSpentMs);
+  char buffer[256];
+  int len = 0;
+
+  len += snprintf(buffer + len, sizeof(buffer) - len,
+                  "кол-во успешных нахождений: %ld\n", successCount);
+  len += snprintf(buffer + len, sizeof(buffer) - len, "вероятность: %f\n",
+                  probability * 100);
+  len += snprintf(buffer + len, sizeof(buffer) - len,
+                  "время выполнения: %fms\n", timeSpentMs);
+
+  write(1, buffer, len);
 
   return 0;
 }
