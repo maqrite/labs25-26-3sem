@@ -32,5 +32,7 @@ StatusCode convertFromBase(const char *numStr, int base, long long *result);
 
 StatusCode dumpMemory(const void *data, size_t size, char **resultStr);
 
+StatusCode convertDoubleToString(double num, char **resultStr);
+
 void testAllFlags(void);
 #endif

@@ -1,4 +1,10 @@
 #include "actions.h"
+#include <limits.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 void printErrors(StatusCode status) {
   switch (status) {
@@ -133,7 +139,13 @@ StatusCode convertToBase(long long num, int base, bool uppercase,
     return OK;
   }
 
-  unsigned long long n = isNegative ? -num : num;
+  unsigned long long n;
+  if (num == LLONG_MIN) {
+    n = (unsigned long long)LLONG_MAX + 1;
+    isNegative = true;
+  } else {
+    n = isNegative ? -num : num;
+  }
 
   const char uppercaseStr[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const char lowercaseStr[] = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -187,8 +199,6 @@ StatusCode convertFromBase(const char *numStr, int base, long long *result) {
     base = 10;
   }
 
-  long long res = 0;
-  long long power = 1;
   bool isNegative = false;
   int startIndex = 0;
   int len = strlen(numStr);
@@ -198,18 +208,29 @@ StatusCode convertFromBase(const char *numStr, int base, long long *result) {
     startIndex = 1;
   }
 
-  for (int i = len - 1; i >= startIndex; i--) {
+  unsigned long long tempRes = 0;
+  unsigned long long cutoff =
+      (unsigned long long)LLONG_MAX + (isNegative ? 1 : 0);
+  unsigned long long cutlim = cutoff % base;
+
+  cutoff /= base;
+
+  for (int i = startIndex; i < len; i++) {
     int val = getCharValue(numStr[i]);
 
     if (val < 0 || val >= base) {
       return INVALID_PARAMETER;
     }
 
-    res += val * power;
-    power *= base;
+    if (tempRes > cutoff ||
+        (tempRes == cutoff && (unsigned long long)val > cutlim)) {
+      return INVALID_PARAMETER;
+    }
+
+    tempRes = tempRes * base + val;
   }
 
-  *result = isNegative ? -res : res;
+  *result = isNegative ? -(long long)tempRes : (long long)tempRes;
 
   return OK;
 }
@@ -242,6 +263,77 @@ StatusCode dumpMemory(const void *data, size_t size, char **resultStr) {
   return OK;
 }
 
+StatusCode convertDoubleToString(double num, char **resultStr) {
+  char *intStr = NULL;
+  char *fracStr = NULL;
+  StatusCode status;
+
+  bool isNegative = num < 0;
+  if (isNegative) {
+    num = -num;
+  }
+
+  long long intPart = (long long)num;
+  status = convertToBase(intPart, 10, false, &intStr);
+  if (status != OK) {
+    return status;
+  }
+
+  double fracPart = num - (double)intPart;
+
+  long long fracNum = (long long)((fracPart * 1000000.0) + 0.5);
+
+  if (fracNum >= 1000000) {
+    fracNum = 0;
+    intPart++;
+    free(intStr);
+    status = convertToBase(intPart, 10, false, &intStr);
+    if (status != OK) {
+      return status;
+    }
+  }
+
+  status = convertToBase(fracNum, 10, false, &fracStr);
+  if (status != OK) {
+    free(intStr);
+    return status;
+  }
+
+  int fracLen = strlen(fracStr);
+  int zerosToPad = 6 - fracLen;
+
+  if (zerosToPad < 0) {
+    zerosToPad = 0;
+  }
+
+  size_t totalLen = (isNegative ? 1 : 0) + strlen(intStr) + 1 + 6 + 1;
+  *resultStr = (char *)malloc(totalLen * sizeof(char));
+  if (*resultStr == NULL) {
+    free(intStr);
+    free(fracStr);
+    return MEMORY_ALLOCATION_ERROR;
+  }
+
+  (*resultStr)[0] = '\0';
+
+  if (isNegative) {
+    strcat(*resultStr, "-");
+  }
+
+  strcat(*resultStr, intStr);
+  strcat(*resultStr, ".");
+
+  for (int i = 0; i < zerosToPad; i++) {
+    strcat(*resultStr, "0");
+  }
+
+  strncat(*resultStr, fracStr, 6 - zerosToPad);
+
+  free(intStr);
+  free(fracStr);
+  return OK;
+}
+
 int oversprintf(char *str, const char *format, ...) {
   va_list args;
   va_start(args, format);
@@ -250,6 +342,7 @@ int oversprintf(char *str, const char *format, ...) {
   int writtenChars = 0;
   int totalWritten = 0;
   StatusCode status;
+  char *tempStr = NULL;
 
   while (*format) {
 
@@ -258,45 +351,44 @@ int oversprintf(char *str, const char *format, ...) {
 
       switch (*format) {
       case 'R':
-
         if (*(format + 1) == 'o') {
           format++;
           int num = va_arg(args, int);
-          char *romanStr = NULL;
 
-          status = convertToRoman(num, &romanStr);
+          status = convertToRoman(num, &tempStr);
           if (status != OK) {
             va_end(args);
             return -1;
           }
 
-          strcpy(pStr, romanStr);
-          writtenChars = strlen(romanStr);
+          strcpy(pStr, tempStr);
+          writtenChars = strlen(tempStr);
           pStr += writtenChars;
           totalWritten += writtenChars;
-          free(romanStr);
+          free(tempStr);
+          tempStr = NULL;
+          break;
         }
-        break;
 
       case 'Z':
         if (*(format + 1) == 'r') {
           format++;
           unsigned int num = va_arg(args, unsigned int);
-          char *zeckStr = NULL;
 
-          status = zeckendorfRepr(num, &zeckStr);
+          status = zeckendorfRepr(num, &tempStr);
           if (status != OK) {
             va_end(args);
             return -1;
           }
 
-          strcpy(pStr, zeckStr);
-          writtenChars = strlen(zeckStr);
+          strcpy(pStr, tempStr);
+          writtenChars = strlen(tempStr);
           pStr += writtenChars;
           totalWritten += writtenChars;
-          free(zeckStr);
+          free(tempStr);
+          tempStr = NULL;
+          break;
         }
-        break;
 
       case 'C': {
         bool isUpper = (*(format + 1) == 'V');
@@ -304,22 +396,21 @@ int oversprintf(char *str, const char *format, ...) {
           format++;
           int number = va_arg(args, int);
           int base = va_arg(args, int);
-          char *resultS = NULL;
 
-          status = convertToBase(number, base, isUpper, &resultS);
+          status = convertToBase(number, base, isUpper, &tempStr);
           if (status != OK) {
             va_end(args);
             return -1;
           }
 
-          strcpy(pStr, resultS);
-          writtenChars = strlen(resultS);
+          strcpy(pStr, tempStr);
+          writtenChars = strlen(tempStr);
           pStr += writtenChars;
           totalWritten += writtenChars;
-          free(resultS);
+          free(tempStr);
+          tempStr = NULL;
+          break;
         }
-
-        break;
       }
 
       case 't':
@@ -336,16 +427,20 @@ int oversprintf(char *str, const char *format, ...) {
             return -1;
           }
 
-          char tempBuffer[65];
+          status = convertToBase(decRes, 10, false, &tempStr);
+          if (status != OK) {
+            va_end(args);
+            return -1;
+          }
 
-          writtenChars =
-              snprintf(tempBuffer, sizeof(tempBuffer), "%lld", decRes);
-
-          strcpy(pStr, tempBuffer);
+          strcpy(pStr, tempStr);
+          writtenChars = strlen(tempStr);
           pStr += writtenChars;
           totalWritten += writtenChars;
+          free(tempStr);
+          tempStr = NULL;
+          break;
         }
-        break;
       }
 
       case 'm': {
@@ -393,21 +488,27 @@ int oversprintf(char *str, const char *format, ...) {
         }
 
         if (ptr) {
-          char *dumpStr = NULL;
-          status = dumpMemory(ptr, dataSize, &dumpStr);
+          status = dumpMemory(ptr, dataSize, &tempStr);
           if (status != OK) {
             va_end(args);
             return -1;
           }
 
-          strcpy(pStr, dumpStr);
-          int len = strlen(dumpStr);
+          strcpy(pStr, tempStr);
+          int len = strlen(tempStr);
           pStr += len;
           totalWritten += len;
 
-          free(dumpStr);
+          free(tempStr);
+          tempStr = NULL;
+          break;
         }
+      }
 
+      default: {
+        *pStr++ = '%';
+        *pStr++ = *format;
+        totalWritten += 2;
         break;
       }
 
@@ -416,11 +517,146 @@ int oversprintf(char *str, const char *format, ...) {
         totalWritten++;
         break;
 
-      default:
-        *pStr++ = '%';
-        *pStr++ = *format;
-        totalWritten += 2;
+      case 'd':
+      case 'i': {
+        long long val = (long long)va_arg(args, int);
+        status = convertToBase(val, 10, false, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        writtenChars = strlen(tempStr);
+        strcpy(pStr, tempStr);
+        pStr += writtenChars;
+        totalWritten += writtenChars;
+        free(tempStr);
         break;
+      }
+
+      case 'u': {
+        long long val = (long long)va_arg(args, unsigned int);
+        status = convertToBase(val, 10, false, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        writtenChars = strlen(tempStr);
+        strcpy(pStr, tempStr);
+        pStr += writtenChars;
+        totalWritten += writtenChars;
+        free(tempStr);
+        break;
+      }
+
+      case 'x': {
+        long long val = (long long)va_arg(args, unsigned int);
+        status = convertToBase(val, 16, false, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        writtenChars = strlen(tempStr);
+        strcpy(pStr, tempStr);
+        pStr += writtenChars;
+        totalWritten += writtenChars;
+        free(tempStr);
+        break;
+      }
+
+      case 'X': {
+        long long val = (long long)va_arg(args, unsigned int);
+        status = convertToBase(val, 16, true, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        writtenChars = strlen(tempStr);
+        strcpy(pStr, tempStr);
+        pStr += writtenChars;
+        totalWritten += writtenChars;
+        free(tempStr);
+        break;
+      }
+
+      case 'o': {
+        long long val = (long long)va_arg(args, unsigned int);
+        status = convertToBase(val, 8, false, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        writtenChars = strlen(tempStr);
+        strcpy(pStr, tempStr);
+        pStr += writtenChars;
+        totalWritten += writtenChars;
+        free(tempStr);
+        break;
+      }
+
+      case 'f': {
+        double val = va_arg(args, double);
+        status = convertDoubleToString(val, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        writtenChars = strlen(tempStr);
+        strcpy(pStr, tempStr);
+        pStr += writtenChars;
+        totalWritten += writtenChars;
+        free(tempStr);
+        tempStr = NULL;
+        break;
+      }
+
+      case 'c': {
+        char val = (char)va_arg(args, int);
+        *pStr++ = val;
+        totalWritten++;
+        break;
+      }
+
+      case 's': {
+        char *val = va_arg(args, char *);
+        if (val == NULL) {
+          val = "(null)";
+        }
+        writtenChars = strlen(val);
+        strcpy(pStr, val);
+        pStr += writtenChars;
+        totalWritten += writtenChars;
+        break;
+      }
+
+      case 'p': {
+        void *val = va_arg(args, void *);
+        if (val == NULL) {
+          writtenChars = strlen("(nil)");
+          strcpy(pStr, "(nil)");
+          pStr += writtenChars;
+          totalWritten += writtenChars;
+          break;
+        }
+
+        uintptr_t ptrVal = (uintptr_t)val;
+
+        *pStr++ = '0';
+        *pStr++ = 'x';
+        totalWritten += 2;
+
+        status = convertToBase((unsigned long long)ptrVal, 16, false, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+
+        writtenChars = strlen(tempStr);
+        strcpy(pStr, tempStr);
+        pStr += writtenChars;
+        totalWritten += writtenChars;
+        free(tempStr);
+        break;
+      }
       }
     } else {
       *pStr++ = *format;
@@ -442,6 +678,7 @@ int overfprintf(FILE *stream, const char *format, ...) {
 
   int totalWritten = 0;
   StatusCode status;
+  char *tempStr = NULL;
 
   while (*format) {
 
@@ -455,37 +692,37 @@ int overfprintf(FILE *stream, const char *format, ...) {
         if (*(format + 1) == 'o') {
           format++;
           int num = va_arg(args, int);
-          char *romanStr = NULL;
 
-          status = convertToRoman(num, &romanStr);
+          status = convertToRoman(num, &tempStr);
           if (status != OK) {
             va_end(args);
             return -1;
           }
 
-          fputs(romanStr, stream);
-          totalWritten += strlen(romanStr);
-          free(romanStr);
+          fputs(tempStr, stream);
+          totalWritten += strlen(tempStr);
+          free(tempStr);
+          tempStr = NULL;
+          break;
         }
-        break;
 
       case 'Z':
         if (*(format + 1) == 'r') {
           format++;
           unsigned int num = va_arg(args, unsigned int);
-          char *zeckStr = NULL;
 
-          status = zeckendorfRepr(num, &zeckStr);
+          status = zeckendorfRepr(num, &tempStr);
           if (status != OK) {
             va_end(args);
             return -1;
           }
 
-          fputs(zeckStr, stream);
-          totalWritten += strlen(zeckStr);
-          free(zeckStr);
+          fputs(tempStr, stream);
+          totalWritten += strlen(tempStr);
+          free(tempStr);
+          tempStr = NULL;
+          break;
         }
-        break;
 
       case 'C': {
         bool isUpper = (*(format + 1) == 'V');
@@ -493,19 +730,19 @@ int overfprintf(FILE *stream, const char *format, ...) {
           format++;
           int number = va_arg(args, int);
           int base = va_arg(args, int);
-          char *resultS = NULL;
 
-          status = convertToBase(number, base, isUpper, &resultS);
+          status = convertToBase(number, base, isUpper, &tempStr);
           if (status != OK) {
             va_end(args);
             return -1;
           }
 
-          fputs(resultS, stream);
-          totalWritten += strlen(resultS);
-          free(resultS);
+          fputs(tempStr, stream);
+          totalWritten += strlen(tempStr);
+          free(tempStr);
+          tempStr = NULL;
+          break;
         }
-        break;
       }
 
       case 't':
@@ -522,13 +759,17 @@ int overfprintf(FILE *stream, const char *format, ...) {
             return -1;
           }
 
-          int writtenNow = fprintf(stream, "%lld", decRes);
-          if (writtenNow > 0) {
-            totalWritten += writtenNow;
+          status = convertToBase(decRes, 10, false, &tempStr);
+          if (status != OK) {
+            va_end(args);
+            return -1;
           }
+          fputs(tempStr, stream);
+          totalWritten += strlen(tempStr);
+          free(tempStr);
+          tempStr = NULL;
+          break;
         }
-
-        break;
       }
 
       case 'm': {
@@ -576,19 +817,25 @@ int overfprintf(FILE *stream, const char *format, ...) {
         }
 
         if (ptr) {
-          char *dumpStr = NULL;
-          status = dumpMemory(ptr, dataSize, &dumpStr);
+          status = dumpMemory(ptr, dataSize, &tempStr);
           if (status != OK) {
             va_end(args);
             return -1;
           }
 
-          fputs(dumpStr, stream);
-          totalWritten += strlen(dumpStr);
+          fputs(tempStr, stream);
+          totalWritten += strlen(tempStr);
 
-          free(dumpStr);
+          free(tempStr);
+          tempStr = NULL;
+          break;
         }
+      }
 
+      default: {
+        fputc('%', stream);
+        fputc(*format, stream);
+        totalWritten += 2;
         break;
       }
 
@@ -597,11 +844,125 @@ int overfprintf(FILE *stream, const char *format, ...) {
         totalWritten++;
         break;
 
-      default:
-        fputc('%', stream);
-        fputc(*format, stream);
-        totalWritten += 2;
+      case 'd':
+      case 'i': {
+        long long val = (long long)va_arg(args, int);
+        status = convertToBase(val, 10, false, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        fputs(tempStr, stream);
+        totalWritten += strlen(tempStr);
+        free(tempStr);
         break;
+      }
+
+      case 'u': {
+        long long val = (long long)va_arg(args, unsigned int);
+        status = convertToBase(val, 10, false, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        fputs(tempStr, stream);
+        totalWritten += strlen(tempStr);
+        free(tempStr);
+        break;
+      }
+
+      case 'x': {
+        long long val = (long long)va_arg(args, unsigned int);
+        status = convertToBase(val, 16, false, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        fputs(tempStr, stream);
+        totalWritten += strlen(tempStr);
+        free(tempStr);
+        break;
+      }
+
+      case 'X': {
+        long long val = (long long)va_arg(args, unsigned int);
+        status = convertToBase(val, 16, true, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        fputs(tempStr, stream);
+        totalWritten += strlen(tempStr);
+        free(tempStr);
+        break;
+      }
+
+      case 'o': {
+        long long val = (long long)va_arg(args, unsigned int);
+        status = convertToBase(val, 8, false, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        fputs(tempStr, stream);
+        totalWritten += strlen(tempStr);
+        free(tempStr);
+        break;
+      }
+
+      case 'f': {
+        double val = va_arg(args, double);
+
+        status = convertDoubleToString(val, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        fputs(tempStr, stream);
+        totalWritten += strlen(tempStr);
+        free(tempStr);
+        tempStr = NULL;
+        break;
+      }
+
+      case 'c': {
+        fputc((char)va_arg(args, int), stream);
+        totalWritten++;
+        break;
+      }
+
+      case 's': {
+        char *val = va_arg(args, char *);
+        if (val == NULL) {
+          val = "(null)";
+        }
+        fputs(val, stream);
+        totalWritten += strlen(val);
+        break;
+      }
+
+      case 'p': {
+        void *val = va_arg(args, void *);
+        if (val == NULL) {
+          fputs("(nil)", stream);
+          totalWritten += strlen("(nil)");
+          break;
+        }
+
+        uintptr_t ptrVal = (uintptr_t)val;
+        fputs("0x", stream);
+        totalWritten += 2;
+
+        status = convertToBase((unsigned long long)ptrVal, 16, false, &tempStr);
+        if (status != OK) {
+          va_end(args);
+          return -1;
+        }
+        fputs(tempStr, stream);
+        totalWritten += strlen(tempStr);
+        free(tempStr);
+        break;
+      }
       }
     } else {
       fputc(*format, stream);
@@ -614,62 +975,122 @@ int overfprintf(FILE *stream, const char *format, ...) {
   return totalWritten;
 }
 
+static int g_test_count = 0;
+static int g_test_passed = 0;
+
+static void runTest(const char *testName, const char *expected,
+                    const char *actual) {
+  g_test_count++;
+  printf("  [Тест %d] %s\n", g_test_count, testName);
+  if (strcmp(expected, actual) == 0) {
+    printf("    \x1b[32mPASS\x1b[0m\n");
+    g_test_passed++;
+  } else {
+    printf("    \x1b[31mFAIL\x1b[0m\n");
+    printf("    Ожидалось: \"%s\"\n", expected);
+    printf("    Получено:  \"%s\"\n", actual);
+  }
+}
+
+static void runTestInt(const char *testName, int expected, int actual) {
+  g_test_count++;
+  printf("  [Тест %d] %s\n", g_test_count, testName);
+  if (expected == actual) {
+    printf("    \x1b[32mPASS\x1b[0m (Код: %d)\n", actual);
+    g_test_passed++;
+  } else {
+    printf("    \x1b[31mFAIL\x1b[0m\n");
+    printf("    Ожидалось: %d\n", expected);
+    printf("    Получено:  %d\n", actual);
+  }
+}
+
 void testAllFlags(void) {
   char buffer[1024];
+
   printf("========= НАЧАЛО ТЕСТИРОВАНИЯ ФУНКЦИЙ =========\n\n");
+  g_test_count = 0;
+  g_test_passed = 0;
 
-  printf("--- Тест %%Ro ---\n");
-  overfprintf(stdout, "Число 1999 -> %Ro\n", 1999);
-  oversprintf(buffer, "Число 42 -> %Ro | Число 3999 -> %Ro", 42, 3999);
-  printf("%s\n\n", buffer);
+  printf("--- Тесты Кастомных Флагов ---\n");
+  oversprintf(buffer, "Римское 1999: %Ro", 1999);
+  runTest("%Ro (Римское)", "Римское 1999: MCMXCIX", buffer);
 
-  printf("--- Тест %%Zr ---\n");
-  overfprintf(stdout, "Число 17 -> %Zr\n",
-              17); // 13+3+1 = F_7+F_4+F_2 -> 1010011
-  oversprintf(buffer, "Число 100 -> %Zr | Число 0 -> %Zr", 100, 0);
-  printf("%s\n\n", buffer);
+  oversprintf(buffer, "Цекендорф 17: %Zr", 17);
+  runTest("%Zr (Цекендорф)", "Цекендорф 17: 1010011", buffer); // 1+3+13=17
 
-  printf("--- Тест %%Cv и %%CV ---\n");
-  overfprintf(stdout, "Число 255 (base 16, low): %Cv\n", 255, 16);
-  overfprintf(stdout, "Число 255 (base 16, up): %CV\n", 255, 16);
-  overfprintf(stdout, "Число -42 (base 2): %Cv\n", -42, 2);
-  oversprintf(buffer, "Число 12345 (base 36, up): %CV", 12345, 36);
-  printf("%s\n\n", buffer);
+  oversprintf(buffer, "Base16 low: %Cv", 255, 16);
+  runTest("%Cv (Base16 low)", "Base16 low: ff", buffer);
 
-  printf("--- Тест %%to и %%TO ---\n");
-  overfprintf(stdout, "Строка 'ff' (base 16) -> %to\n", "ff", 16);
-  oversprintf(buffer,
-              "Строка 'FF' (base 16) -> %TO | Строка '-101010' (base 2) -> %to",
-              "FF", 16, "-101010", 2);
-  printf("%s\n\n", buffer);
+  oversprintf(buffer, "Base16 up: %CV", 255, 16);
+  runTest("%CV (Base16 up)", "Base16 up: FF", buffer);
 
-  printf("--- Тест дампов памяти ---\n");
-  int signed_int = -1;
-  unsigned int unsigned_int = 255;
-  double dbl = 3.14;
-  float flt = 1.0f / 3.0f;
-  overfprintf(stdout, "int (-1): %mi\n", signed_int);
-  overfprintf(stdout, "uint (255): %mu\n", unsigned_int);
-  overfprintf(stdout, "double (3.14): %md\n", dbl);
-  overfprintf(stdout, "float (1/3): %mf\n\n", flt);
+  oversprintf(buffer, "Base2 neg: %Cv", -42, 2);
+  runTest("%Cv (Base2 neg)", "Base2 neg: -101010", buffer);
 
-  printf("--- Тест некорректных и граничных случаев ---\n");
+  oversprintf(buffer, "From 'ff' base 16: %to", "ff", 16);
+  runTest("%to (From Base)", "From 'ff' base 16: 255", buffer);
 
-  overfprintf(stdout, "Неизвестный флаг %%Qx -> %Qx\n");
+  oversprintf(buffer, "From '-101010' base 2: %TO", "-101010", 2);
+  runTest("%TO (From Base neg)", "From '-101010' base 2: -42", buffer);
 
-  overfprintf(stdout, "Неполный флаг %%R -> %R\n");
+  printf("\n--- Тесты Стандартных Флагов (Реализованных Самостоятельно) "
+         "---\n");
+  oversprintf(buffer, "Int: %d", -123);
+  runTest("%d (int)", "Int: -123", buffer);
 
-  int res = overfprintf(stdout, "Строка 'gg' (base 16) -> %to\n", "gg", 16);
-  if (res == -1) {
-    printf("Функция %%to вернула ошибку, как и ожидалось.\n");
-  }
+  oversprintf(buffer, "Unsigned: %u", 456);
+  runTest("%u (unsigned)", "Unsigned: 456", buffer);
 
-  res = overfprintf(stdout, "Число 4000 -> %Ro\n", 4000);
-  if (res == -1) {
-    printf("Функция %%Ro вернула ошибку, как и ожидалось.\n");
-  }
+  oversprintf(buffer, "Hex: %x, HEX: %X, Oct: %o", 255, 255, 255);
+  runTest("%x, %X, %o (hex/oct)", "Hex: ff, HEX: FF, Oct: 377", buffer);
 
-  overfprintf(stdout, "Число 123 (base 99) -> %Cv\n", 123, 99);
+  oversprintf(buffer, "Char: %c, String: %s", 'A', "Hello");
+  runTest("%c, %s (char/string)", "Char: A, String: Hello", buffer);
 
-  printf("\n========= ТЕСТИРОВАНИЕ ЗАВЕРШЕНО =========\n");
+  oversprintf(buffer, "Null String: %s", (char *)NULL);
+  runTest("%s (null string)", "Null String: (null)", buffer);
+
+  oversprintf(buffer, "Pointer: %p", (void *)0x123ABC);
+  runTest("%p (pointer)", "Pointer: 0x123abc", buffer);
+
+  oversprintf(buffer, "Null Pointer: %p", (void *)NULL);
+  runTest("%p (null pointer)", "Null Pointer: (nil)", buffer);
+
+  oversprintf(buffer, "Double: %f", 3.141592);
+  runTest("%f (double)", "Double: 3.141592", buffer);
+
+  oversprintf(buffer, "Neg Double: %f", -123.456);
+  runTest("%f (neg double)", "Neg Double: -123.456000", buffer);
+
+  oversprintf(buffer, "Double rounding: %f", 0.9999999);
+  runTest("%f (rounding)", "Double rounding: 1.000000", buffer);
+
+  printf("\n--- Тесты Ошибок и Граничных Случаев ---\n");
+  int res = oversprintf(buffer, "%Ro", 4000);
+  runTestInt("%Ro (Error > 3999)", -1, res);
+
+  res = oversprintf(buffer, "%to", "gg", 16);
+  runTestInt("%to (Invalid input)", -1, res);
+
+  oversprintf(buffer, "Неизвестный флаг: %Qx");
+  runTest("Unknown flag %Qx", "Неизвестный флаг: %Qx", buffer);
+
+  oversprintf(buffer, "Неполный флаг: %R");
+  runTest("Incomplete flag %R", "Неполный флаг: %R", buffer);
+
+  oversprintf(buffer, "Процент: %%");
+  runTest("Percent sign %%", "Процент: %", buffer);
+
+  oversprintf(buffer, "INT_MIN: %d", INT_MIN);
+  runTest("INT_MIN %d", "INT_MIN: -2147483648", buffer);
+
+  oversprintf(buffer, "From LLONG_MIN str: %to", "-9223372036854775808", 10);
+  runTest("%to (LLONG_MIN)", "From LLONG_MIN str: -9223372036854775808",
+          buffer);
+
+  printf("\n----------------------------------------\n");
+  printf("  \x1b[1mИтог: %d / %d тестов пройдено\x1b[0m\n", g_test_passed,
+         g_test_count);
+  printf("========================================\n\n");
 }
