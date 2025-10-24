@@ -267,7 +267,6 @@ StatusCode convertDoubleToString(double num, char **resultStr) {
   char *intStr = NULL;
   char *fracStr = NULL;
   StatusCode status;
-
   bool isNegative = num < 0;
   if (isNegative) {
     num = -num;
@@ -282,6 +281,8 @@ StatusCode convertDoubleToString(double num, char **resultStr) {
   double fracPart = num - (double)intPart;
 
   long long fracNum = (long long)((fracPart * 1000000.0) + 0.5);
+
+  // дальше Бога нет
 
   if (fracNum >= 1000000) {
     fracNum = 0;
