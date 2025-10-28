@@ -1,0 +1,5 @@
+101,Ivanov,Ivan,IU7-11,5,4,5,3,5
+102,Petrov,Petr,IU7-12,3,3,4,3,4
+103,Zaytsev,Valentin,IU7-11,5,5,5,5,5
+104,Smirnov,Alex,IU7-12,4,4,4,4,4
+105,Ivanova,Anna,IU7-13,3,5,4,5,5

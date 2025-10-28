@@ -1,0 +1,16 @@
+#ifndef COMMON_H
+#define COMMON_H
+
+typedef enum {
+  OK = 0,
+  INVALID_INPUT = 1,
+  INVALID_ARGC = 2,
+  FILE_OPEN_ERROR = 3,
+  MEMORY_ALLOC_ERROR = 4,
+  BAD_FILE_FORMAT = 5,
+  INVALID_STUDENT_DATA = 6,
+  STUDENT_NOT_FOUND = 7,
+  UNKNOWN_ERROR = 8
+} StatusCode;
+
+#endif
