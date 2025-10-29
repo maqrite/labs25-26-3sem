@@ -1,4 +1,3 @@
-# Компилятор C
 CC = gcc
 
 CFLAGS = -std=c99 -Wall -Wextra -g -O2
