@@ -1,6 +1,6 @@
 CC = gcc
 
-CFLAGS = -std=c99 -Wall -Wextra -g -O2
+CFLAGS = -std=c99 -Wall -Werror -Wextra -g -O2
 LDFLAGS = -lm
 
 
