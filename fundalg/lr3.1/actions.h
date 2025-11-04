@@ -12,6 +12,8 @@ typedef enum {
 
 void printErrors(StatusCode status);
 
+void reverseString(char *str, int len);
+
 StatusCode convertToBase2r(const unsigned int nIn, const int r, char *buffer,
                            const size_t bufferSize);
 

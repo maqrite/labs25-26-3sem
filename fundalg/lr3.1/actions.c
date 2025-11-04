@@ -1,6 +1,5 @@
 #include "actions.h"
 #include <limits.h>
-#include <stddef.h>
 #include <stdio.h>
 
 void printErrors(StatusCode status) {
@@ -44,6 +43,26 @@ StatusCode convertToBase2r(const unsigned int nIn, const int r, char *buffer,
   int i = 0;
 
   const unsigned int mask = ~((~0U) << r);
+
+  if (n == 0) {
+    buffer[i++] = '\0';
+    buffer[i] = '\0';
+    return OK;
+  }
+
+  while (n != 0) {
+    unsigned int digit = n & mask;
+
+    buffer[i] = DIGITS_MAP[digit];
+
+    i++;
+
+    n = n >> r;
+  }
+
+  buffer[i] = '\0';
+
+  reverseString(buffer, i);
 
   return OK;
 }
