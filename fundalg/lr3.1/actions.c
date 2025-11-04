@@ -20,3 +20,13 @@ void printErrors(StatusCode status) {
     break;
   }
 }
+
+StatusCode convertToBase2r(const unsigned int n, const int r, char *buffer,
+                           const size_t bufferSize) {
+
+  if (r < 1 || r > 5 || buffer == NULL) {
+    return INVALID_ARGS;
+  }
+
+  return OK;
+}
