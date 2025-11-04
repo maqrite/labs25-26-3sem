@@ -1,13 +1,13 @@
 #include "actions.h"
 
 int main(void) {
-  unsigned int number;
+  int numberInput;
   int r;
   StatusCode status = OK;
 
   printf("Введите десятичное число: ");
 
-  if (scanf("%u", &number) != 1) {
+  if (scanf("%u", &numberInput) != 1) {
     status = INVALID_INPUT;
     printErrors(status);
     return status;
@@ -21,12 +21,15 @@ int main(void) {
     return status;
   }
 
+  unsigned int numberToConvert = (unsigned int)numberInput;
+
   char resultBuffer[(sizeof(unsigned int) * CHAR_BIT) + 1];
 
-  status = convertToBase2r(number, r, resultBuffer, sizeof(resultBuffer));
+  status =
+      convertToBase2r(numberToConvert, r, resultBuffer, sizeof(resultBuffer));
 
   if (status == OK) {
-    printf("число %u (основание 10)\n", number);
+    printf("число %u (основание 10)\n", numberInput);
     printf("число %s (основание 2^%d = %d)\n", resultBuffer, r, (1 << r));
   } else {
     printErrors(status);
