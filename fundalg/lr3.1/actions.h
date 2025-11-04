@@ -12,7 +12,7 @@ typedef enum {
 
 void printErrors(StatusCode status);
 
-StatusCode convertToBase2r(const unsigned int n, const int r, char *buffer,
+StatusCode convertToBase2r(const unsigned int nIn, const int r, char *buffer,
                            const size_t bufferSize);
 
 #endif

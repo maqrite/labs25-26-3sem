@@ -23,7 +23,7 @@ void printErrors(StatusCode status) {
   }
 }
 
-StatusCode convertToBase2r(const unsigned int n, const int r, char *buffer,
+StatusCode convertToBase2r(const unsigned int nIn, const int r, char *buffer,
                            const size_t bufferSize) {
 
   if (r < 1 || r > 5 || buffer == NULL) {
@@ -37,5 +37,13 @@ StatusCode convertToBase2r(const unsigned int n, const int r, char *buffer,
   if (bufferSize < minBufferSize) {
     return BUFFER_TOO_SMALL;
   }
+
+  const char *DIGITS_MAP = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  unsigned int n = nIn;
+  int i = 0;
+
+  const unsigned int mask = ~((~0U) << r);
+
   return OK;
 }
