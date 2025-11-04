@@ -57,7 +57,7 @@ StatusCode convertToBase2r(const unsigned int nIn, const int r, char *buffer,
   const unsigned int mask = ~((~0U) << r);
 
   if (n == 0) {
-    buffer[i++] = '\0';
+    buffer[i++] = '0';
     buffer[i] = '\0';
     return OK;
   }
