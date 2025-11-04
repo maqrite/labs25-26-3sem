@@ -1,4 +1,6 @@
 #include "actions.h"
+#include <limits.h>
+#include <stddef.h>
 #include <stdio.h>
 
 void printErrors(StatusCode status) {
@@ -28,5 +30,12 @@ StatusCode convertToBase2r(const unsigned int n, const int r, char *buffer,
     return INVALID_ARGS;
   }
 
+  const size_t bits = sizeof(unsigned int) * CHAR_BIT;
+  const size_t requiredDigits = (bits + r - 1) / r;
+  const size_t minBufferSize = requiredDigits + 1;
+
+  if (bufferSize < minBufferSize) {
+    return BUFFER_TOO_SMALL;
+  }
   return OK;
 }
