@@ -1,6 +1,4 @@
 #include "actions.h"
-#include <limits.h>
-#include <stdio.h>
 
 void printErrors(StatusCode status) {
   switch (status) {
