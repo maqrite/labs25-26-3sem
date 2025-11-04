@@ -22,6 +22,20 @@ void printErrors(StatusCode status) {
   }
 }
 
+void reverseString(char *str, int len) {
+  int i = 0;
+  int j = len - 1;
+  char temp;
+
+  while (i < j) {
+    temp = str[i];
+    str[i] = str[j];
+    str[j] = temp;
+    i++;
+    j--;
+  }
+}
+
 StatusCode convertToBase2r(const unsigned int nIn, const int r, char *buffer,
                            const size_t bufferSize) {
 
