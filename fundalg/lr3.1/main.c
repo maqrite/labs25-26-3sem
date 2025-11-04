@@ -29,7 +29,7 @@ int main(void) {
       convertToBase2r(numberToConvert, r, resultBuffer, sizeof(resultBuffer));
 
   if (status == OK) {
-    printf("число %u (основание 10)\n", numberInput);
+    printf("число %d (основание 10)\n", numberInput);
     printf("число %s (основание 2^%d = %d)\n", resultBuffer, r, (1 << r));
   } else {
     printErrors(status);
