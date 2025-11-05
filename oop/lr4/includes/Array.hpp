@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Figure.hpp"
-#include <cstddef>
 #include <new>
 #include <stdexcept>
 #include <utility>
