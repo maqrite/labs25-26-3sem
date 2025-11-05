@@ -3,7 +3,6 @@
 #include "Figure.hpp"
 #include "Point.hpp"
 #include <cmath>
-#include <cstddef>
 #include <istream>
 #include <memory>
 #include <ostream>
