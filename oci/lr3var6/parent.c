@@ -106,6 +106,7 @@ int main(void) {
 
     report_error_and_exit("Child: execv failed");
   } else {
+
     while (1) {
       sem_wait(sem_full);
 
@@ -126,8 +127,8 @@ int main(void) {
     sem_close(sem_empty);
 
     shm_unlink(shm_name);
-    shm_unlink(sem_full_name);
-    shm_unlink(sem_empty_name);
+    sem_unlink(sem_full_name);
+    sem_unlink(sem_empty_name);
   }
 
   return 0;
