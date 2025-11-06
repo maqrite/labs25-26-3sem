@@ -33,7 +33,7 @@ int is_equal_vector(const Vector *v1, const Vector *v2);
 
 void copy_vector(Vector *dest, const Vector *src);
 
-Vector *copy_vector_new(const Vector *src);
+Vector *copy_vector(const Vector *src);
 
 void push_back_vector(Vector *v, VECTOR_TYPE value);
 

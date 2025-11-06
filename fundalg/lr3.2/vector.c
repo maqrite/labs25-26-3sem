@@ -100,3 +100,5 @@ void copy_vector(Vector *dest, const Vector *src) {
 
   dest->size = src->size;
 }
+
+Vector *copy_vector() { return; }
