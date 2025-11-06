@@ -56,3 +56,28 @@ int is_equal_vector(const Vector *v1, const Vector *v2) {
 
   return 1;
 }
+
+int _vectorResize(Vector *v, size_t newCapacity);
+
+void copy_vector(Vector *dest, const Vector *src) {
+  if (dest == NULL || src == NULL) {
+    return;
+  }
+
+  erase_vector(dest);
+
+  if (dest->capacity < src->size) {
+    if (_vectorResize(dest, src->size) != 0) {
+      return;
+    }
+  }
+
+  dest->copyVoidPtr = src->copyVoidPtr;
+  dest->deleteVoidPtr = src->deleteVoidPtr;
+
+  for (size_t i = 0; i < src->size; i++) {
+    dest->data[i] = dest->copyVoidPtr(src->data[i]);
+  }
+
+  dest->size = src->size;
+}
