@@ -57,7 +57,7 @@ int is_equal_vector(const Vector *v1, const Vector *v2) {
   return 1;
 }
 
-int _vectorResize(Vector *v, size_t newCapacity);
+int vectorResize(Vector *v, size_t newCapacity);
 
 void copy_vector(Vector *dest, const Vector *src) {
   if (dest == NULL || src == NULL) {
@@ -67,7 +67,7 @@ void copy_vector(Vector *dest, const Vector *src) {
   erase_vector(dest);
 
   if (dest->capacity < src->size) {
-    if (_vectorResize(dest, src->size) != 0) {
+    if (vectorResize(dest, src->size) != 0) {
       return;
     }
   }

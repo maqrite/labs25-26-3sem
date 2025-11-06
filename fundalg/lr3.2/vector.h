@@ -43,4 +43,8 @@ VECTOR_TYPE get_at_vector(const Vector *v, size_t index);
 
 void delete_vector(Vector *v);
 
+//
+int vector_resize(Vector *v, size_t new_capacity);
+//
+
 #endif
