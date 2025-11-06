@@ -57,7 +57,26 @@ int is_equal_vector(const Vector *v1, const Vector *v2) {
   return 1;
 }
 
-int vectorResize(Vector *v, size_t newCapacity);
+int vectorResize(Vector *v, size_t newCapacity) {
+  if (newCapacity == 0) {
+    free(v->data);
+    v->data = NULL;
+    v->capacity = 0;
+    v->size = 0;
+    return 0;
+  }
+
+  VECTOR_TYPE *newData =
+      (VECTOR_TYPE *)realloc(v->data, newCapacity * sizeof(VECTOR_TYPE));
+  if (newData == NULL) {
+    return 1;
+  }
+
+  v->data = newData;
+  v->capacity = newCapacity;
+
+  return 0;
+}
 
 void copy_vector(Vector *dest, const Vector *src) {
   if (dest == NULL || src == NULL) {
