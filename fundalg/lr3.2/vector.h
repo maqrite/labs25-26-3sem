@@ -3,6 +3,7 @@
 
 #include "actions.h"
 
+#include <cstddef>
 #include <stddef.h>
 
 #ifndef VECTOR_TYPE

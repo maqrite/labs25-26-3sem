@@ -27,3 +27,18 @@ Vector create_vector(size_t initialCapacity, size_t (*copyFunc)(size_t),
 
   return v;
 }
+
+void erase_vector(Vector *v) {
+  if (v == NULL) {
+    return;
+  }
+
+  for (size_t i = 0; i < v->size; i++) {
+    v->deleteVoidPtr(v->data);
+  }
+
+  free(v->data);
+  v->data = NULL;
+  v->size = 0;
+  v->capacity = 0;
+}
