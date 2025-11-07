@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c99 -Wall -Wextra -Werror -O2
+CFLAGS = -std=c99 -Wall -Wextra -Werror
 
 TARGET = program
 TEST_RUNNER_INT = test_runner_int
