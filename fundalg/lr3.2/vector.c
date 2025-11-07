@@ -158,8 +158,8 @@ void delete_at_vector(Vector *v, size_t index) {
 
 VECTOR_TYPE get_at_vector(const Vector *v, size_t index) {
   if (v == NULL || index >= v->size) {
-    printf("выход за границы массива\n");
-    exit(INVALID_INPUT);
+    fprintf(stderr, "выход за границы массива\n");
+    return (VECTOR_TYPE)0;
   }
 
   return v->data[index];
