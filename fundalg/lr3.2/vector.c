@@ -1,5 +1,6 @@
 #include "vector.h"
 
+#include <cstddef>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -120,4 +121,21 @@ Vector *copy_vector_new(const Vector *src) {
   copy_vector(newV, src);
 
   return newV;
+}
+
+void push_back_vector(Vector *v, size_t value) {
+  if (v == NULL) {
+    return;
+  }
+
+  if (v->size == v->capacity) {
+    size_t newCapacity = (v->capacity == 0) ? 8 : v->capacity * 2;
+
+    if (vectorResize(v, newCapacity) != 0) {
+      return;
+    }
+  }
+
+  v->data[v->size] = v->copyVoidPtr(value);
+  v->size++;
 }
