@@ -163,3 +163,12 @@ VECTOR_TYPE get_at_vector(const Vector *v, size_t index) {
 
   return v->data[index];
 }
+
+void delete_vector(Vector *v) {
+  if (v == NULL) {
+    return;
+  }
+
+  erase_vector(v);
+  free(v);
+}
