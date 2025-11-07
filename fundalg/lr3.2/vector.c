@@ -1,4 +1,5 @@
 #include "vector.h"
+#include "actions.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -152,4 +153,13 @@ void delete_at_vector(Vector *v, size_t index) {
   }
 
   v->size--;
+}
+
+VECTOR_TYPE get_at_vector(const Vector *v, size_t index) {
+  if (v == NULL || index >= v->size) {
+    printf("выход за границы массива\n");
+    exit(INVALID_INPUT);
+  }
+
+  return v->data[index];
 }
