@@ -173,13 +173,3 @@ void delete_vector(Vector *v) {
   erase_vector(v);
   free(v);
 }
-
-void print_vector(const char *title, const Vector *v) {
-  printf("%s (size: %zu, capacity: %zu): [", title, v->size, v->capacity);
-
-  for (size_t i = 0; i < v->size; i++) {
-    printf("%d ", (int)get_at_vector(v, i));
-  }
-
-  printf("]\n");
-}
