@@ -2,15 +2,10 @@
 #define VECTOR_H
 
 #include "actions.h"
-
 #include <stddef.h>
 
 #ifndef VECTOR_TYPE
-
-#define VECTOR_TYPE size_t // убрать потом size_t
-
-// #error "VECTOR_TYPE не определен"
-
+#error "VECTOR_TYPE не определен"
 #endif
 
 typedef struct {
