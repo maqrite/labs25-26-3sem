@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define XSTR(s) STR(s)
+#define STR(s) #s
+
 #define VECTOR_TYPE int
 
 #define FORMAT_SPECIFIER "%d" // для char " c"
@@ -38,7 +41,7 @@ int main() {
   Vector *v3 = NULL;
 
   int choice = 0;
-  printf("тест с типом (" #VECTOR_TYPE ") \n");
+  printf("тест с типом (%s) \n", XSTR(VECTOR_TYPE));
 
   while (choice != 10) {
     printf("\n");
@@ -47,7 +50,7 @@ int main() {
     print_vector_ui("v3 (new_copy, heap)", v3);
     printf("\n");
 
-    printf("меню:");
+    printf("меню:\n");
     printf(" 1. push_back_vector (в v1)\n");
     printf(" 2. delete_at_vector (из v1)\n");
     printf(" 3. get_at_vector (из v1)\n");
@@ -69,7 +72,7 @@ int main() {
     switch (choice) {
     case 1: {
       VECTOR_TYPE val;
-      printf("Введите значение (" FORMAT_SPECIFIER "):", val);
+      printf("Введите значение (%s): ", FORMAT_SPECIFIER);
       if (scanf(FORMAT_SPECIFIER, &val) != 1) {
         clear_stdin();
         break;
@@ -114,6 +117,9 @@ int main() {
       if (v3 != NULL) {
         printf("сначала нужно удалить v3 (опция 9)\n");
       } else {
+
+        v3 = copy_vector_new(&v1);
+
         if (v3 == NULL) {
           printf("copy_vector_new вернул NULL\n");
         } else {
