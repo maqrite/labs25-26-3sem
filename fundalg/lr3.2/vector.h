@@ -44,6 +44,8 @@ void delete_vector(Vector *v);
 
 //
 int vector_resize(Vector *v, size_t new_capacity);
+
+void print_vector(const char *title, const Vector *v);
 //
 
 #endif
