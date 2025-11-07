@@ -59,7 +59,7 @@ int is_equal_vector(const Vector *v1, const Vector *v2) {
   return 1;
 }
 
-int vectorResize(Vector *v, size_t newCapacity) {
+int vector_resize(Vector *v, size_t newCapacity) {
   if (newCapacity == 0) {
     free(v->data);
     v->data = NULL;
@@ -88,7 +88,7 @@ void copy_vector(Vector *dest, const Vector *src) {
   erase_vector(dest);
 
   if (dest->capacity < src->size) {
-    if (vectorResize(dest, src->size) != 0) {
+    if (vector_resize(dest, src->size) != 0) {
       return;
     }
   }
@@ -132,7 +132,7 @@ void push_back_vector(Vector *v, VECTOR_TYPE value) {
   if (v->size == v->capacity) {
     size_t newCapacity = (v->capacity == 0) ? 8 : v->capacity * 2;
 
-    if (vectorResize(v, newCapacity) != 0) {
+    if (vector_resize(v, newCapacity) != 0) {
       return;
     }
   }
