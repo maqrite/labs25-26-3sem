@@ -1,13 +1,13 @@
 #include "vector.h"
 #include "actions.h"
 
-#include <cstddef>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
-Vector create_vector(size_t initialCapacity, size_t (*copyFunc)(size_t),
-                     void (*deleteFunc)(size_t)) {
+Vector create_vector(size_t initialCapacity,
+                     VECTOR_TYPE (*copyFunc)(VECTOR_TYPE),
+                     void (*deleteFunc)(VECTOR_TYPE)) {
 
   Vector v;
 
@@ -36,7 +36,7 @@ void erase_vector(Vector *v) {
   }
 
   for (size_t i = 0; i < v->size; i++) {
-    v->deleteVoidPtr(v->data);
+    v->deleteVoidPtr(v->data[i]);
   }
 
   free(v->data);
@@ -124,7 +124,7 @@ Vector *copy_vector_new(const Vector *src) {
   return newV;
 }
 
-void push_back_vector(Vector *v, size_t value) {
+void push_back_vector(Vector *v, VECTOR_TYPE value) {
   if (v == NULL) {
     return;
   }
