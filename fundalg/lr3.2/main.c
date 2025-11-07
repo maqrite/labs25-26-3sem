@@ -6,8 +6,10 @@
 #define STR(s) #s
 
 #define VECTOR_TYPE int
+// для смены типа так же поменять -DVECTOR_TYPE в Makefile
+// на "<type>"
 
-#define FORMAT_SPECIFIER "%d" // для char " c"
+#define FORMAT_SPECIFIER "%d" // для char " %c"
 
 #define PRINT_SPECIFIER "%d"
 
