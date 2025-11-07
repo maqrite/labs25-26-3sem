@@ -1,6 +1,5 @@
 #include "vector.h"
 
-#include <cstddef>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -138,4 +137,19 @@ void push_back_vector(Vector *v, size_t value) {
 
   v->data[v->size] = v->copyVoidPtr(value);
   v->size++;
+}
+
+void delete_at_vector(Vector *v, size_t index) {
+  if (v == NULL || index >= v->size) {
+    return;
+  }
+
+  v->deleteVoidPtr(v->data[index]);
+
+  if (index < v->size - 1) {
+    memmove(&v->data[index], &v->data[index + 1],
+            (v->size - index - 1) * sizeof(VECTOR_TYPE));
+  }
+
+  v->size--;
 }
