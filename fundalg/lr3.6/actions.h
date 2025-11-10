@@ -11,4 +11,7 @@ typedef enum {
 
 void printErrors(StatusCode status);
 
+bool areBracketsPaired(char open, char close);
+int check_brackets(const char *str);
+
 #endif
