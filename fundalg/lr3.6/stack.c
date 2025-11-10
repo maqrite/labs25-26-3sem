@@ -64,3 +64,14 @@ int peek(node **stack) {
     return -1;
   }
 }
+
+void printStack(node **stack) {
+  node *temp = *stack;
+
+  while (temp != NULL) {
+    printf("%d-> ", temp->data);
+    temp = temp->next;
+  }
+
+  printf("\n");
+}
