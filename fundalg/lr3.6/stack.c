@@ -38,3 +38,5 @@ int deleteHead(node **head) {
   free(temp);
   return 0;
 }
+
+bool isEmpty(node **stack) { return (*stack == NULL); }
