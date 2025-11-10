@@ -46,3 +46,13 @@ void push(node **stack, char data) {
     printf("стэк переполнен\n");
   }
 }
+
+int pop(node **stack) {
+  if (!isEmpty(stack)) {
+    printf("стэк пуст\n");
+    return -1;
+  }
+
+  deleteHead(stack);
+  return 0;
+}
