@@ -56,3 +56,11 @@ int pop(node **stack) {
   deleteHead(stack);
   return 0;
 }
+
+int peek(node **stack) {
+  if (!isEmpty(stack)) {
+    return (*stack)->data;
+  } else {
+    return -1;
+  }
+}
