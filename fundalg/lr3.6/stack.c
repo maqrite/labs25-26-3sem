@@ -40,3 +40,9 @@ int deleteHead(node **head) {
 }
 
 bool isEmpty(node **stack) { return (*stack == NULL); }
+
+void push(node **stack, char data) {
+  if (insertBeforeHead(stack, data)) {
+    printf("стэк переполнен\n");
+  }
+}
