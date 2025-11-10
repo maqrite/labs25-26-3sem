@@ -31,3 +31,10 @@ int insertBeforeHead(node **head, char data) {
 
   return 0;
 }
+
+int deleteHead(node **head) {
+  node *temp = *head;
+  *head = (*head)->next;
+  free(temp);
+  return 0;
+}
