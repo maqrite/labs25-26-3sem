@@ -1,4 +1,5 @@
 #include "stack.h"
+#include "actions.h"
 #include <stdlib.h>
 
 node *createNode(char data) {
@@ -42,13 +43,13 @@ int deleteHead(node **head) {
 bool isEmpty(node **stack) { return (*stack == NULL); }
 
 void push(node **stack, char data) {
-  if (insertBeforeHead(stack, data)) {
-    printf("стэк переполнен\n");
+  if (insertBeforeHead(stack, data) == -1) {
+    printErrors(MEMORY_ALLOC_ERROR);
   }
 }
 
 int pop(node **stack) {
-  if (!isEmpty(stack)) {
+  if (isEmpty(stack)) {
     printf("стэк пуст\n");
     return -1;
   }
@@ -69,7 +70,7 @@ void printStack(node **stack) {
   node *temp = *stack;
 
   while (temp != NULL) {
-    printf("%d-> ", temp->data);
+    printf("%c-> ", temp->data);
     temp = temp->next;
   }
 
