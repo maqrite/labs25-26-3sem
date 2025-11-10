@@ -13,3 +13,21 @@ node *createNode(char data) {
 
   return newNode;
 }
+
+int insertBeforeHead(node **head, char data) {
+  node *newNode = createNode(data);
+
+  if (!newNode) {
+    return -1;
+  }
+
+  if (*head == NULL) {
+    *head = newNode;
+    return 0;
+  }
+
+  newNode->next = *head;
+  *head = newNode;
+
+  return 0;
+}
