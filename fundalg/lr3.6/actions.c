@@ -15,3 +15,20 @@ void printErrors(StatusCode status) {
     break;
   }
 }
+
+bool areBracketsPaired(char open, char close) {
+  if (open == '(' && close == ')') {
+    return true;
+  }
+  if (open == '[' && close == ']') {
+    return true;
+  }
+  if (open == '{' && close == '}') {
+    return true;
+  }
+  if (open == '<' && close == '>') {
+    return true;
+  }
+
+  return false;
+}

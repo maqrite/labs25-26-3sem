@@ -1,6 +1,7 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
+#include <stdbool.h>
 #include <stdio.h>
 
 typedef enum {
