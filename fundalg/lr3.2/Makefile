@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c99 -Wall -Wextra -Werror
+CFLAGS = -std=c99 -Wall -Wextra -Werror -fsanitize=address
 
 TARGET = program
 TEST_RUNNER_INT = test_runner_int
