@@ -310,3 +310,101 @@ int is_equal_list(const LinkedList *l1, const LinkedList *l2) {
 
   return 1;
 }
+
+void push_stack(LinkedList *stack, const LIST_TYPE *value) {
+  push_back_list(stack, value);
+}
+
+LIST_TYPE *pop_stack(LinkedList *stack) { return pop_back_list(stack); }
+
+LIST_TYPE *peek_stack(const LinkedList *stack) {
+  if (stack == NULL || stack->size == 0) {
+    return NULL;
+  }
+
+  return copy_liver_internal(stack->tail->data);
+}
+
+void enqueue(LinkedList *queue, const LIST_TYPE *value) {
+  push_back_list(queue, value);
+}
+
+LIST_TYPE *dequeue(LinkedList *queue) { return pop_front_list(queue); }
+
+LIST_TYPE *peek_queue(const LinkedList *queue) {
+  if (queue == NULL || queue->size == 0) {
+    return 0;
+  }
+
+  return copy_liver_internal(queue->head->data);
+}
+
+int calculate_age(Date dob) {
+  time_t t = time(NULL);
+  struct tm tm = *localtime(&t);
+
+  int currentYear = tm.tm_year + 1900;
+  int currentMonth = tm.tm_mon + 1;
+  int currentDay = tm.tm_mday;
+
+  int age = currentYear - dob.year;
+
+  if (dob.month > currentMonth ||
+      (dob.month == currentMonth && dob.day > currentDay)) {
+    age--;
+  }
+
+  return age;
+}
+
+int compare_liver_by_age(const LIST_TYPE *l1, const LIST_TYPE *l2) {
+  return calculate_age(l1->dob) - calculate_age(l2->dob);
+}
+
+int insert_sorted(LinkedList *list, LIST_TYPE *newLiver) {
+  if (list == NULL || newLiver == NULL) {
+    free(newLiver);
+    return 0;
+  }
+
+  Node *newNode = (Node *)malloc(sizeof(Node));
+  if (newNode == NULL) {
+    printf("ошибка выделения памяти\n");
+    free(newLiver);
+    return 0;
+  }
+
+  newNode->data = newLiver;
+  newNode->prev = NULL;
+  newNode->next = NULL;
+
+  if (list->size == 0) {
+    list->head = newNode;
+    list->tail = newNode;
+  } else {
+    Node *current = list->head;
+    while (current != NULL &&
+           compare_liver_by_age(newLiver, current->data) > 0) {
+      current = current->next;
+    }
+
+    if (current == NULL) {
+      newNode->prev = list->tail;
+      list->tail->next = newNode;
+      list->tail = newNode;
+    } else if (current == list->head) {
+      newNode->next = list->head;
+      list->head->prev = newNode;
+      list->head = newNode;
+    } else {
+      newNode->next = current;
+      newNode->prev = current->prev;
+      current->prev->next = newNode;
+      current->prev = newNode;
+    }
+  }
+
+  list->size++;
+
+  return 1;
+}
