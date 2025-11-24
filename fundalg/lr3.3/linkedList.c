@@ -593,3 +593,59 @@ void push_modification(LinkedList *undoStack, Modification mod) {
 
   undoStack->size++;
 }
+
+void undo_modifications(LinkedList *list, LinkedList *undoStack) {
+  if (list == NULL || undoStack == NULL) {
+    return;
+  }
+
+  if (undoStack->size = 0) {
+    printf("нет изменений для отмены\n");
+    return;
+  }
+
+  size_t numUndo = undoStack->size / 2;
+  printf("Отмена последних %zu изменений", numUndo);
+
+  for (size_t i = 0; i < numUndo; i++) {
+    LIST_TYPE *modDataPtr = pop_list_internal(undoStack, 0);
+    if (modDataPtr == NULL) {
+      break;
+    }
+
+    Modification *mod = (Modification *)modDataPtr;
+
+    switch (mod->type) {
+    case MOD_ADD: {
+      LIST_TYPE *removedLiver = delete_at_list(list, mod->index);
+      if (removedLiver == NULL) {
+        printf("не удалось удалить добавленный элемент по индексу %zu\n",
+               mod->index);
+      } else {
+        free(removedLiver);
+      }
+      break;
+    }
+
+    case MOD_DELETE: {
+      insert_at_list(list, mod->index, mod->old_data);
+      break;
+    }
+
+    case MOD_EDIT: {
+      Node *nodeToEdit = get_node_at_list(list, mod->index);
+      if (nodeToEdit != NULL) {
+        memcpy(nodeToEdit->data, mod->old_data, sizeof(LIST_TYPE));
+      } else {
+        printf("не найден элемент для edit по индексу %zu.\n", mod->index);
+      }
+      break;
+    }
+    }
+
+    free_modification(mod);
+    free(mod);
+  }
+
+  printf("отмена завершена\n");
+}
