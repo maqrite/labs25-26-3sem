@@ -1,5 +1,4 @@
 #include "linkedList.h"
-#include <cstddef>
 #include <ctype.h>
 #include <math.h>
 #include <stddef.h>
@@ -235,4 +234,55 @@ LIST_TYPE *delete_at_list(LinkedList *list, size_t index) {
   free(toRemove);
   list->size--;
   return removedData;
+}
+
+LIST_TYPE *get_at_list(const LinkedList *list, size_t index) {
+  if (list == NULL || index >= list->size) {
+    printf("выход за границы\n");
+    return NULL;
+  }
+
+  Node *found = get_node_at_list(list, index);
+  if (found == NULL) {
+    return NULL;
+  }
+
+  return copy_liver_internal(found->data);
+}
+
+int is_equal_liver(const LIST_TYPE *l1, const LIST_TYPE *l2) {
+  if (l1 == NULL || l2 == NULL) {
+    return 0;
+  }
+
+  if (l1->id != l2->id) {
+    return 0;
+  }
+
+  if (strcmp(l1->surname, l2->surname) != 0) {
+    return 0;
+  }
+
+  if (strcmp(l1->name, l2->name) != 0) {
+    return 0;
+  }
+
+  if (strcmp(l1->patronymic, l2->patronymic) != 0) {
+    return 0;
+  }
+
+  if (l1->dob.day != l2->dob.day || l1->dob.month != l2->dob.month ||
+      l1->dob.year != l2->dob.year) {
+    return 0;
+  }
+
+  if (l1->gender != l2->gender) {
+    return 0;
+  }
+
+  if (fabs(l1->avgIncome - l2->avgIncome) > 1e-9) {
+    return 0;
+  }
+
+  return 1;
 }
