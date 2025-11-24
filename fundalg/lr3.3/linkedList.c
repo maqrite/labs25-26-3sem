@@ -452,6 +452,12 @@ int read_file_to_list(const char *filename, LinkedList *list) {
       erase_list(list);
       return 0;
     }
+
+    if (!insert_sorted(list, newLiver)) {
+      fclose(file);
+      erase_list(list);
+      return 0;
+    }
   }
 
   if (!feof(file)) {
@@ -599,7 +605,7 @@ void undo_modifications(LinkedList *list, LinkedList *undoStack) {
     return;
   }
 
-  if (undoStack->size = 0) {
+  if (undoStack->size == 0) {
     printf("нет изменений для отмены\n");
     return;
   }
