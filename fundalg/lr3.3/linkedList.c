@@ -91,3 +91,40 @@ void push_list_internal(LinkedList *list, const LIST_TYPE *value, int isFront) {
 
   list->size++;
 }
+
+void push_back_list(LinkedList *list, const LIST_TYPE *value) {
+  push_list_internal(list, value, 0);
+}
+
+void push_front_list(LinkedList *list, const LIST_TYPE *value) {
+  push_list_internal(list, value, 1);
+}
+
+LIST_TYPE *pop_list_internal(LinkedList *list, int isFront) {
+  if (list == NULL || list->size == 0) {
+    return NULL;
+  }
+
+  Node *toRemove = isFront ? list->head : list->tail;
+  LIST_TYPE *valueOut = toRemove->data;
+
+  if (list->size == 1) {
+    list->head = NULL;
+    list->tail = NULL;
+  } else if (isFront) {
+    list->head = toRemove->next;
+    if (list->head != NULL) {
+      list->head->prev = NULL;
+    }
+  } else {
+    list->tail = toRemove->prev;
+    if (list->tail != NULL) {
+      list->tail->next = NULL;
+    }
+  }
+
+  free(toRemove);
+  list->size--;
+
+  return valueOut;
+}
