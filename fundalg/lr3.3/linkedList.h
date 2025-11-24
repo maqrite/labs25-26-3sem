@@ -2,7 +2,6 @@
 #define LINKED_LIST_H
 
 #include "actions.h"
-#include <cstddef>
 #include <stddef.h>
 #include <time.h>
 
@@ -82,5 +81,9 @@ typedef struct {
 
 void undo_modifications(LinkedList *list, LinkedList *undo_stack);
 void push_modification(LinkedList *undo_dtack, Modification mod);
+
+// my help func
+void delete_node(Node *node);
+LIST_TYPE *copy_liver_internal(const LIST_TYPE *src);
 
 #endif
