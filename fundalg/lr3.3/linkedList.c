@@ -550,3 +550,46 @@ void print_list(const LinkedList *list) {
 
   printf("---\n");
 }
+
+void free_modification(Modification *mod) {
+  if (mod == NULL) {
+    return;
+  }
+
+  free(mod->old_data);
+  free(mod->new_data);
+}
+
+void push_modification(LinkedList *undoStack, Modification mod) {
+  Modification *modPtr = (Modification *)malloc(sizeof(Modification));
+  if (modPtr == NULL) {
+    printf("ошибка выделения памяти\n");
+    free_modification(&mod);
+    return;
+  }
+
+  memcpy(modPtr, &mod, sizeof(Modification));
+
+  Node *newNode = (Node *)malloc(sizeof(Node));
+  if (newNode == NULL) {
+    printf("ошибка выделения памяти\n");
+    free(modPtr);
+    free_modification(&mod);
+    return;
+  }
+
+  newNode->data = (LIST_TYPE *)modPtr;
+  newNode->prev = NULL;
+  newNode->next = NULL;
+
+  if (undoStack->size == 0) {
+    undoStack->head = newNode;
+    undoStack->tail = newNode;
+  } else {
+    newNode->prev = undoStack->tail;
+    undoStack->tail->next = newNode;
+    undoStack->tail = newNode;
+  }
+
+  undoStack->size++;
+}
