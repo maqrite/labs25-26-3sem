@@ -1,5 +1,6 @@
 #include "linkedList.h"
 #include <ctype.h>
+#include <iso646.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -461,5 +462,57 @@ int read_file_to_list(const char *filename, LinkedList *list) {
   }
 
   fclose(file);
+  return 1;
+}
+
+Node *find_liver(const LinkedList *list, unsigned int id) {
+  if (list == NULL || list->size == 0) {
+    return NULL;
+  }
+
+  Node *current = list->head;
+  while (current != NULL) {
+    if (current->data->id == id) {
+      return current;
+    }
+
+    current = current->next;
+  }
+
+  return NULL;
+}
+
+void modify_liver(Node *node, const LIST_TYPE *newData) {
+  if (node == NULL || newData == NULL) {
+    return;
+  }
+
+  unsigned int originalId = node->data->id;
+  memcpy(node->data, newData, sizeof(LIST_TYPE));
+  node->data->id = originalId;
+}
+
+int write_list_to_file(const char *filename, const LinkedList *list) {
+  if (filename == NULL || list == NULL) {
+    return 0;
+  }
+
+  FILE *file = fopen(filename, "w");
+  if (file == NULL) {
+    printf("ошибка открытия файла %s \n", filename);
+    return 0;
+  }
+
+  Node *current = list->head;
+  while (current != NULL) {
+    LIST_TYPE *l = current->data;
+    fprintf(file, "%u %s %s %s %d %d %d %c %.2lf\n", l->id, l->surname, l->name,
+            l->patronymic, l->dob.day, l->dob.month, l->dob.year, l->gender,
+            l->avgIncome);
+    current = current->next;
+  }
+
+  fclose(file);
+
   return 1;
 }
