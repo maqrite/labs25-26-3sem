@@ -204,3 +204,35 @@ void insert_at_list(LinkedList *list, size_t index, const LIST_TYPE *value) {
 
   list->size++;
 }
+
+LIST_TYPE *delete_at_list(LinkedList *list, size_t index) {
+  if (list == NULL || list->size == 0) {
+    return NULL;
+  }
+
+  if (index >= list->size) {
+    printf("выход за границы\n");
+    return NULL;
+  }
+
+  if (index == 0) {
+    return pop_front_list(list);
+  }
+
+  if (index == list->size - 1) {
+    return pop_back_list(list);
+  }
+
+  Node *toRemove = get_node_at_list(list, index);
+  if (toRemove == NULL) {
+    return NULL;
+  }
+
+  toRemove->prev->next = toRemove->next;
+  toRemove->next->prev = toRemove->prev;
+
+  LIST_TYPE *removedData = toRemove->data;
+  free(toRemove);
+  list->size--;
+  return removedData;
+}
