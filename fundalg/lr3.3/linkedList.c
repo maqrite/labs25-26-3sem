@@ -286,3 +286,27 @@ int is_equal_liver(const LIST_TYPE *l1, const LIST_TYPE *l2) {
 
   return 1;
 }
+
+int is_equal_list(const LinkedList *l1, const LinkedList *l2) {
+  if (l1 == NULL || l2 == NULL) {
+    return 0;
+  }
+
+  if (l1->size != l2->size) {
+    return 0;
+  }
+
+  Node *current1 = l1->head;
+  Node *current2 = l2->head;
+
+  while (current1 != NULL) {
+    if (!is_equal_liver(current1->data, current2->data)) {
+      return 0;
+    }
+
+    current1 = current1->next;
+    current2 = current2->next;
+  }
+
+  return 1;
+}
