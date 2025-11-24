@@ -85,5 +85,6 @@ void push_modification(LinkedList *undo_dtack, Modification mod);
 // my help func
 void delete_node(Node *node);
 LIST_TYPE *copy_liver_internal(const LIST_TYPE *src);
+void push_list_internal(LinkedList *list, const LIST_TYPE *value, int isFront);
 
 #endif
