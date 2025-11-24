@@ -63,9 +63,9 @@ LIST_TYPE *peek_queue(const LinkedList *queue);
 
 // functions
 int read_file_to_list(const char *filename, LinkedList *list);
-int insert_sorted(LinkedList *list, LIST_TYPE *new_liver);
+int insert_sorted(LinkedList *list, LIST_TYPE *newLiver);
 Node *find_liver(const LinkedList *list, unsigned int id);
-void modify_liver(Node *node, const LIST_TYPE *new_data);
+void modify_liver(Node *node, const LIST_TYPE *newData);
 int write_list_to_file(const char *filename, const LinkedList *list);
 void print_liver(const LIST_TYPE *liver);
 void print_list(const LinkedList *list);
@@ -79,8 +79,8 @@ typedef struct {
   LIST_TYPE *new_data;
 } Modification;
 
-void undo_modifications(LinkedList *list, LinkedList *undo_stack);
-void push_modification(LinkedList *undo_dtack, Modification mod);
+void undo_modifications(LinkedList *list, LinkedList *undoStack);
+void push_modification(LinkedList *undoStack, Modification mod);
 
 // my help func
 void delete_node(Node *node);
