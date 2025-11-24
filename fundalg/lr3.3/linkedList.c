@@ -408,3 +408,58 @@ int insert_sorted(LinkedList *list, LIST_TYPE *newLiver) {
 
   return 1;
 }
+
+int read_file_to_list(const char *filename, LinkedList *list) {
+  if (filename == NULL || list == NULL) {
+    return 0;
+  }
+
+  FILE *file = fopen(filename, "r");
+  if (file == NULL) {
+    printf("ошибка открытия файла %s \n", filename);
+    return 0;
+  }
+
+  erase_list(list);
+
+  LIST_TYPE tempLiver;
+  int day, month, year;
+  char patronymicBuf[MAX_PATRONYMIC_LEN];
+  int readCount;
+
+  while ((readCount = fscanf(file, "%u %s %s %s %d %d %d %c %lf", &tempLiver.id,
+                             tempLiver.surname, tempLiver.name, patronymicBuf,
+                             &day, &month, &year, &tempLiver.gender,
+                             &tempLiver.avgIncome)) == 9) {
+
+    if (tempLiver.avgIncome < 0.0 ||
+        (tempLiver.gender != 'M' && tempLiver.gender != 'W')) {
+      printf("Ошибка валидации данных в файле, пропускаем запись (ID: %u)\n",
+             tempLiver.id);
+      continue;
+    }
+
+    strncpy(tempLiver.patronymic, patronymicBuf, MAX_PATRONYMIC_LEN - 1);
+    tempLiver.patronymic[MAX_PATRONYMIC_LEN - 1] = '\0';
+    tempLiver.dob.day = day;
+    tempLiver.dob.month = month;
+    tempLiver.dob.year = year;
+
+    LIST_TYPE *newLiver = copy_liver_internal(&tempLiver);
+    if (newLiver == NULL) {
+      fclose(file);
+      erase_list(list);
+      return 0;
+    }
+  }
+
+  if (!feof(file)) {
+    printf("ошибка чтения файла\n");
+    fclose(file);
+    erase_list(list);
+    return 0;
+  }
+
+  fclose(file);
+  return 1;
+}
