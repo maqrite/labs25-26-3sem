@@ -1,4 +1,5 @@
 #include "linkedList.h"
+#include <cstddef>
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
@@ -128,3 +129,13 @@ LIST_TYPE *pop_list_internal(LinkedList *list, int isFront) {
 
   return valueOut;
 }
+
+LIST_TYPE *pop_back_list(LinkedList *list) {
+  return pop_list_internal(list, 0);
+}
+
+LIST_TYPE *pop_front_list(LinkedList *list) {
+  return pop_list_internal(list, 1);
+}
+
+Node *get_node_at_list(const LinkedList *list, size_t index);
