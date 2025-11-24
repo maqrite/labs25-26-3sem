@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <ctype.h>
 #include <math.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -138,4 +139,68 @@ LIST_TYPE *pop_front_list(LinkedList *list) {
   return pop_list_internal(list, 1);
 }
 
-Node *get_node_at_list(const LinkedList *list, size_t index);
+Node *get_node_at_list(const LinkedList *list, size_t index) {
+  if (list == NULL || index >= list->size) {
+    return NULL;
+  }
+
+  Node *current;
+  if (index < list->size / 2) {
+    current = list->head;
+    for (size_t i = 0; i < index; i++) {
+      current = current->next;
+    }
+  } else {
+    current = list->tail;
+    for (size_t i = list->size - 1; i > index; i--) {
+      current = current->prev;
+    }
+  }
+
+  return current;
+}
+
+void insert_at_list(LinkedList *list, size_t index, const LIST_TYPE *value) {
+  if (list == NULL || value == NULL) {
+    return;
+  }
+
+  if (index > list->size) {
+    printf("выход за границы\n");
+    return;
+  }
+
+  if (index == 0) {
+    push_front_list(list, value);
+    return;
+  }
+
+  if (index == list->size) {
+    push_back_list(list, value);
+  }
+
+  Node *current = get_node_at_list(list, index);
+  if (current == NULL) {
+    return;
+  }
+
+  LIST_TYPE *dataCopy = copy_liver_internal(value);
+  if (dataCopy == NULL) {
+    return;
+  }
+
+  Node *newNode = (Node *)malloc(sizeof(Node));
+  if (newNode == NULL) {
+    printf("ошибка выделения памяти\n");
+    free(dataCopy);
+    return;
+  }
+
+  newNode->data = dataCopy;
+  newNode->next = current;
+  newNode->prev = current->prev;
+  current->prev->next = newNode;
+  current->prev = newNode;
+
+  list->size++;
+}
