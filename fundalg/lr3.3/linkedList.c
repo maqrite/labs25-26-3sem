@@ -516,3 +516,37 @@ int write_list_to_file(const char *filename, const LinkedList *list) {
 
   return 1;
 }
+
+void print_liver(const LIST_TYPE *liver) {
+  if (liver == NULL) {
+    return;
+  }
+
+  printf(" ID: %u\n", liver->id);
+  printf(" ФИО: %s %s %s\n", liver->surname, liver->name, liver->patronymic);
+  printf(" Дата рождения: %02d.%02d.%d (возраст: %d)\n", liver->dob.day,
+         liver->dob.month, liver->dob.year, calculate_age(liver->dob));
+  printf(" Пол: %c\n", liver->gender);
+  printf(" Средний доход: %.2lf\n", liver->avgIncome);
+}
+
+void print_list(const LinkedList *list) {
+  if (list == NULL || list->size == 0) {
+    printf("список пуст\n");
+    return;
+  }
+
+  printf("---\n");
+
+  Node *current = list->head;
+  size_t index = 0;
+
+  while (current != NULL) {
+    printf("[%zu].\n", index);
+    print_liver(current->data);
+    current = current->next;
+    index++;
+  }
+
+  printf("---\n");
+}
