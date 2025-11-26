@@ -2,7 +2,6 @@
 #include "actions.h"
 #include "stack.h"
 #include <ctype.h>
-#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -260,8 +259,9 @@ StatusCode evaluateRPN(InterpreterState *state, Stack *rpnStack,
 
       ll res;
 
-      if ((status == evaluateOpertion(operand1, operand2, data.op, &res)) !=
-          OK) {
+      status = evaluateOpertion(operand1, operand2, data.op, &res);
+
+      if (status != OK) {
         destroyStack(&evalStack);
         destroyStack(&tempStack);
         return status;
@@ -455,6 +455,13 @@ StatusCode processCommand(InterpreterState *state, const char *commandLine) {
     initializeStack(&operatorStack);
     ll result;
     int varIndex = targetVar - 'A';
+
+    if ((status = infixToRPN(exprStart, &rpnStack, &operatorStack)) != OK) {
+      destroyStack(&rpnStack);
+      destroyStack(&operatorStack);
+      logState(state, commandLine, "error: parsing failed");
+      return status;
+    }
 
     if ((status = evaluateRPN(state, &rpnStack, &result)) != OK) {
       destroyStack(&rpnStack);
