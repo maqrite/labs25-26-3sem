@@ -327,3 +327,5 @@ StatusCode initializeInterpreter(InterpreterState *state,
 
   return OK;
 }
+
+void destroyInterpreter(InterpreterState *state);
