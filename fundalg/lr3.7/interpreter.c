@@ -80,3 +80,27 @@ StatusCode evaluateOpertion(long long operand1, long long operand2, char op,
 
   return OK;
 }
+
+StatusCode logState(InterpreterState *state, const char *command,
+                    const char *operationType) {
+  if (state == NULL || state->logFile == NULL) {
+    return FILE_OPEN_ERROR;
+  }
+
+  fprintf(state->logFile, "[%d] %-25s | ", state->commandCount, command);
+
+  bool firstVar = true;
+  for (int i = 0; i < VAR_COUNT; i++) {
+    if (state->isInit[i]) {
+      if (!firstVar) {
+        fprintf(state->logFile, ", ");
+      }
+      fprintf(state->logFile, "%c=%lld", 'A' + i, state->variables[i]);
+      firstVar = false;
+    }
+  }
+
+  fprintf(state->logFile, " | %s\n", operationType);
+  fflush(state->logFile);
+  return OK;
+}
