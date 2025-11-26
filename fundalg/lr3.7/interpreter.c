@@ -366,7 +366,9 @@ const char *skipToExpression(const char *start, char *varName) {
 
     if (varName != NULL) {
       if (isupper((unsigned char)*p) && (*p >= 'A' && *p <= 'Z')) {
-        *varName = *p;
+        if (varName != NULL) {
+          *varName = *p;
+        }
         p++;
       } else {
         return NULL;
@@ -394,6 +396,16 @@ const char *skipToExpression(const char *start, char *varName) {
   if (isupper((unsigned char)*p) && (*p >= 'A' && *p <= 'Z')) {
     if (varName != NULL) {
       *varName = *p;
+    }
+
+    p++;
+
+    while (*p != '\0' && isspace((unsigned char)*p)) {
+      p++;
+    }
+
+    if (*p != '=') {
+      return NULL;
     }
 
     p++;
