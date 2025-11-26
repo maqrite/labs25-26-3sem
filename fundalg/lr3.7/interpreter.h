@@ -15,7 +15,7 @@ typedef struct {
 
 StatusCode initializeInterpreter(InterpreterState *state,
                                  const char *logFileName);
-StatusCode precessCommand(InterpreterState *state, const char *commandLine);
+StatusCode processCommand(InterpreterState *state, const char *commandLine);
 void destroyInterpreter(InterpreterState *state);
 
 #endif
