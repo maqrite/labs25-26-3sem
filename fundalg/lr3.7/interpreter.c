@@ -401,3 +401,74 @@ const char *skipToExpression(const char *start, char *varName) {
 
   return NULL;
 }
+
+StatusCode processCommand(InterpreterState *state, const char *commandLine) {
+  if (state == NULL || commandLine == NULL) {
+    return INVALID_INPUT;
+  }
+
+  state->commandCount++;
+  StatusCode status = OK;
+  char targetVar = '\0';
+  char trimmedCommand[256];
+  strncpy(trimmedCommand, commandLine, 255);
+  trimmedCommand[255] = '\0';
+  char *end = trimmedCommand + strlen(trimmedCommand) - 1;
+
+  while (end >= trimmedCommand && isspace((unsigned char)*end)) {
+    *end = '\0';
+    end--;
+  }
+
+  const char *exprStart = skipToExpression(trimmedCommand, &targetVar);
+
+  if (exprStart == NULL) {
+    char varForPrint = '\0';
+    skipToExpression(trimmedCommand, &varForPrint);
+
+    if (varForPrint != '\0' && strncmp(trimmedCommand, "print", 5) == 0) {
+      int varIndex = varForPrint - 'A';
+      if (!state->isInit[varIndex]) {
+        printf("переменная %c не инициализирована\n", varForPrint);
+        logState(state, commandLine, "Error: variable not init");
+        return UNEXPECTED_TOKEN;
+      }
+
+      printf("%lld\n", state->variables[varIndex]);
+      logState(state, commandLine, "Print");
+      return OK;
+    }
+
+    logState(state, commandLine, "Error: Unknown or Invalid command");
+    return UNKNOWN_COMMAND;
+  }
+
+  if (targetVar != '\0') {
+    Stack rpnStack, operatorStack;
+    initializeStack(&rpnStack);
+    initializeStack(&operatorStack);
+    ll result;
+    int varIndex = targetVar - 'A';
+
+    if ((status = evaluateRPN(state, &rpnStack, &result)) != OK) {
+      destroyStack(&rpnStack);
+      destroyStack(&operatorStack);
+      logState(state, commandLine, "Error: evaluation failed");
+      return status;
+    }
+
+    state->variables[varIndex] = result;
+    state->isInit[varIndex] = true;
+
+    logState(state, commandLine, "Assignment/Arithmetic operation");
+
+    destroyStack(&rpnStack);
+    destroyStack(&operatorStack);
+
+    return OK;
+  }
+
+  logState(state, commandLine, "Error: unknown or invalid command");
+
+  return UNKNOWN_COMMAND;
+}
