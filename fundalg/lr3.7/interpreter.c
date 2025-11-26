@@ -215,3 +215,97 @@ StatusCode infixToRPN(const char *expression, Stack *outputStack,
 
   return OK;
 }
+
+StatusCode evaluateRPN(InterpreterState *state, Stack *rpnStack,
+                       long long *result) {
+  Stack evalStack;
+  initializeStack(&evalStack);
+  StatusCode status = OK;
+
+  Stack tempStack;
+  initializeStack(&tempStack);
+  StackData data;
+
+  while (pop(rpnStack, &data) == OK) {
+    if (push(&tempStack, data) != OK) {
+      status = MEMORY_ALLOC_ERROR;
+      destroyStack(&evalStack);
+      destroyStack(&tempStack);
+      return status;
+    }
+  }
+
+  while (pop(&tempStack, &data) == OK) {
+    if (isOperator(data.op)) {
+      ll operand2, operand1;
+      StackData opData1, opData2;
+
+      if (pop(&evalStack, &opData2) != OK) {
+        status = UNEXPECTED_TOKEN;
+        destroyStack(&evalStack);
+        destroyStack(&tempStack);
+        return status;
+      }
+
+      if (pop(&evalStack, &opData1) != OK) {
+        status = UNEXPECTED_TOKEN;
+        destroyStack(&evalStack);
+        destroyStack(&tempStack);
+        return status;
+      }
+
+      ll res;
+
+      if ((status == evaluateOpertion(operand1, operand2, data.op, &res)) !=
+          OK) {
+        destroyStack(&evalStack);
+        destroyStack(&tempStack);
+        return status;
+      }
+
+      data.value = res;
+
+      if (push(&evalStack, data) != OK) {
+        status = MEMORY_ALLOC_ERROR;
+        destroyStack(&evalStack);
+        destroyStack(&tempStack);
+        return status;
+      }
+    } else if (isupper((unsigned char)data.op) &&
+               (data.op >= 'A' && data.op <= 'Z')) {
+      int varIndex = data.op - 'A';
+
+      if (!state->isInit[varIndex]) {
+        status = UNEXPECTED_TOKEN;
+        destroyStack(&evalStack);
+        destroyStack(&tempStack);
+        return status;
+      }
+
+      data.value = state->variables[varIndex];
+
+      if (push(&evalStack, data) != OK) {
+        status = MEMORY_ALLOC_ERROR;
+        destroyStack(&evalStack);
+        destroyStack(&tempStack);
+        return status;
+      }
+    } else {
+      if (push(&evalStack, data) != OK) {
+        status = MEMORY_ALLOC_ERROR;
+        destroyStack(&evalStack);
+        destroyStack(&tempStack);
+        return status;
+      }
+    }
+  }
+
+  if (pop(&evalStack, &data) != OK || !isEmptyStack(&evalStack)) {
+    status = UNEXPECTED_TOKEN;
+    destroyStack(&evalStack);
+    destroyStack(&tempStack);
+    return status;
+  }
+
+  *result = data.value;
+}
