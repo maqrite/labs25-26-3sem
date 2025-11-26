@@ -104,3 +104,114 @@ StatusCode logState(InterpreterState *state, const char *command,
   fflush(state->logFile);
   return OK;
 }
+
+StatusCode infixToRPN(const char *expression, Stack *outputStack,
+                      Stack *operatorStack) {
+  const char *p = expression;
+  StackData token;
+
+  while (*p != '\0') {
+    if (isspace((unsigned char)*p)) {
+      p++;
+      continue;
+    }
+
+    if (isdigit((unsigned char)*p)) {
+      char *endptr;
+      token.value = strtoll(p, &endptr, 10);
+      if (push(outputStack, token) != OK) {
+        return MEMORY_ALLOC_ERROR;
+      }
+      p = endptr;
+      continue;
+    }
+
+    if (isupper((unsigned char)*p) && (*p >= 'A' && *p <= 'Z')) {
+      token.op = *p;
+      if (push(outputStack, token) != OK) {
+        return MEMORY_ALLOC_ERROR;
+      }
+      p++;
+      continue;
+    }
+
+    if (isOperator(*p)) {
+      char op = *p;
+      StackData topOpData;
+
+      while (
+          !isEmptyStack(operatorStack) &&
+          peek(operatorStack, &topOpData) == OK && isOperator(topOpData.op) &&
+          (getPrecedence(topOpData.op) > getPrecedence(op) ||
+           (getPrecedence(topOpData.op) == getPrecedence(op) && op != '^'))) {
+
+        if (pop(operatorStack, &topOpData) != OK) {
+          return UNEXPECTED_TOKEN;
+        }
+
+        if (push(outputStack, topOpData) != OK) {
+          return MEMORY_ALLOC_ERROR;
+        }
+      }
+
+      token.op = op;
+      if (push(operatorStack, token) != OK) {
+        return MEMORY_ALLOC_ERROR;
+      }
+      p++;
+      continue;
+    }
+
+    if (*p == '(') {
+      token.op = *p;
+      if (push(operatorStack, token) != OK) {
+        return MEMORY_ALLOC_ERROR;
+      }
+      p++;
+      continue;
+    }
+
+    if (*p == ')') {
+      StackData topOpData;
+
+      while (!isEmptyStack(operatorStack) &&
+             peek(operatorStack, &topOpData) == OK && topOpData.op != '(') {
+        if (pop(operatorStack, &topOpData) != OK) {
+          return UNEXPECTED_TOKEN;
+        }
+
+        if (push(outputStack, topOpData) != OK) {
+          return MEMORY_ALLOC_ERROR;
+        }
+      }
+
+      if (isEmptyStack(operatorStack) || pop(operatorStack, &topOpData) != OK ||
+          topOpData.op != '(') {
+        return UNEXPECTED_TOKEN;
+      }
+
+      p++;
+      continue;
+    }
+
+    return UNEXPECTED_TOKEN;
+  }
+
+  StackData topOpData;
+
+  while (!isEmptyStack(operatorStack)) {
+    if (pop(operatorStack, &topOpData) != OK) {
+      return UNEXPECTED_TOKEN;
+    }
+
+    if (topOpData.op == '(' || topOpData.op == ')') {
+      return UNEXPECTED_TOKEN;
+    }
+
+    if (push(outputStack, topOpData) != OK) {
+      return MEMORY_ALLOC_ERROR;
+    }
+  }
+
+  return OK;
+}
