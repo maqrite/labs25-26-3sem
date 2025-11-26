@@ -247,12 +247,16 @@ StatusCode evaluateRPN(InterpreterState *state, Stack *rpnStack,
         return status;
       }
 
+      operand2 = opData2.value;
+
       if (pop(&evalStack, &opData1) != OK) {
         status = UNEXPECTED_TOKEN;
         destroyStack(&evalStack);
         destroyStack(&tempStack);
         return status;
       }
+
+      operand1 = opData1.value;
 
       ll res;
 
@@ -308,6 +312,8 @@ StatusCode evaluateRPN(InterpreterState *state, Stack *rpnStack,
   }
 
   *result = data.value;
+
+  return OK;
 }
 
 StatusCode initializeInterpreter(InterpreterState *state,
