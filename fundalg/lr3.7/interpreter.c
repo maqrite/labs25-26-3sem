@@ -441,27 +441,24 @@ StatusCode processCommand(InterpreterState *state, const char *commandLine) {
   const char *exprStart = skipToExpression(trimmedCommand, &targetVar);
 
   if (exprStart == NULL) {
-    char varForPrint = '\0';
-    skipToExpression(trimmedCommand, &varForPrint);
-
-    if (varForPrint != '\0' && strncmp(trimmedCommand, "print", 5) == 0) {
-      int varIndex = varForPrint - 'A';
-      if (!state->isInit[varIndex]) {
-        printf("переменная %c не инициализирована\n", varForPrint);
-        logState(state, commandLine, "Error: variable not init");
-        return UNEXPECTED_TOKEN;
-      }
-
-      printf("%lld\n", state->variables[varIndex]);
-      logState(state, commandLine, "Print");
-      return OK;
-    }
-
     logState(state, commandLine, "Error: Unknown or Invalid command");
     return UNKNOWN_COMMAND;
   }
 
-  if (targetVar != '\0') {
+  if (*exprStart == '\0') {
+    int varIndex = targetVar - 'A';
+    if (!state->isInit[varIndex]) {
+      printf("переменная %c не инициализирована\n", targetVar);
+      logState(state, commandLine, "Error: variable not init");
+      return UNEXPECTED_TOKEN;
+    }
+
+    printf("%lld\n", state->variables[varIndex]);
+    logState(state, commandLine, "Print");
+    return OK;
+  }
+
+  {
     Stack rpnStack, operatorStack;
     initializeStack(&rpnStack);
     initializeStack(&operatorStack);
@@ -492,8 +489,4 @@ StatusCode processCommand(InterpreterState *state, const char *commandLine) {
 
     return OK;
   }
-
-  logState(state, commandLine, "Error: unknown or invalid command");
-
-  return UNKNOWN_COMMAND;
 }
