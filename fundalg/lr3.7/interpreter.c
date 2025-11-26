@@ -328,4 +328,76 @@ StatusCode initializeInterpreter(InterpreterState *state,
   return OK;
 }
 
-void destroyInterpreter(InterpreterState *state);
+void destroyInterpreter(InterpreterState *state) {
+  if (state != NULL && state->logFile != NULL) {
+    fclose(state->logFile);
+    state->logFile = NULL;
+  }
+}
+
+const char *skipToExpression(const char *start, char *varName) {
+  const char *p = start;
+
+  while (*p != '\0' && isspace((unsigned char)*p)) {
+    p++;
+  }
+
+  if (strncmp(p, "print", 5) == 0) {
+    p += 5;
+
+    while (*p != '\0' && isspace((unsigned char)*p)) {
+      p++;
+    }
+
+    if (*p != '(') {
+      return NULL;
+    }
+    p++;
+
+    while (*p != '\0' && isspace((unsigned char)*p)) {
+      p++;
+    }
+
+    if (varName != NULL) {
+      if (isupper((unsigned char)*p) && (*p >= 'A' && *p <= 'Z')) {
+        *varName = *p;
+        p++;
+      } else {
+        return NULL;
+      }
+    } else {
+      return NULL;
+    }
+
+    while (*p != '\0' && isspace((unsigned char)*p)) {
+      p++;
+    }
+
+    if (*p != ')') {
+      return NULL;
+    }
+    p++;
+
+    while (*p != '\0' && isspace((unsigned char)*p)) {
+      p++;
+    }
+
+    return *p == '\0' ? p : NULL;
+  }
+
+  if (isupper((unsigned char)*p) && (*p >= 'A' && *p <= 'Z')) {
+    if (varName != NULL) {
+      *varName = *p;
+    }
+
+    p++;
+
+    while (*p != '\0' && isspace((unsigned char)*p)) {
+      p++;
+    }
+
+    return p;
+  }
+
+  return NULL;
+}
