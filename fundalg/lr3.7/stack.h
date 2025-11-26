@@ -4,10 +4,8 @@
 #include "actions.h"
 #include <stdbool.h>
 
-#define ll long long
-
 typedef union {
-  ll value;
+  long long value;
   char op;
 } StackData;
 
