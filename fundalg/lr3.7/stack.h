@@ -28,5 +28,3 @@ StatusCode peek(const Stack *s, StackData *data);
 void destroyStack(Stack *s);
 
 #endif
-
-#endif
