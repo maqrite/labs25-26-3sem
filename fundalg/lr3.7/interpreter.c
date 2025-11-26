@@ -309,3 +309,21 @@ StatusCode evaluateRPN(InterpreterState *state, Stack *rpnStack,
 
   *result = data.value;
 }
+
+StatusCode initializeInterpreter(InterpreterState *state,
+                                 const char *logFileName) {
+  if (state == NULL || logFileName == NULL) {
+    return INVALID_INPUT;
+  }
+
+  memset(state->variables, 0, sizeof(state->variables));
+  memset(state->isInit, 0, sizeof(state->isInit));
+  state->commandCount = 0;
+
+  state->logFile = fopen(logFileName, "w");
+  if (state->logFile == NULL) {
+    return FILE_OPEN_ERROR;
+  }
+
+  return OK;
+}
