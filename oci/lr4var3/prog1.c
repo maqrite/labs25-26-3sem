@@ -34,17 +34,15 @@ int main(void) {
         write(STDOUT_FILENO, out_buffer, len);
       }
     } else if (cmd == 2) {
-      int k;
+      int a, b;
 
-      if (sscanf(buffer, "%*d %d", &k) == 1) {
-        float res = pi(k);
-        len = snprintf(out_buffer, sizeof(out_buffer), "результат (пи): %f\n",
+      if (sscanf(buffer, "%*d %d %d", &a, &b) == 2) {
+        int res = gcd(a, b);
+        len = snprintf(out_buffer, sizeof(out_buffer), "рузультат НОД: %d\n",
                        res);
         write(STDOUT_FILENO, out_buffer, len);
-      } else {
-        len = snprintf(out_buffer, sizeof(out_buffer), "некорректный ввод\n");
-        write(STDOUT_FILENO, out_buffer, len);
       }
+
     } else if (cmd == 0) {
       len = snprintf(out_buffer, sizeof(out_buffer),
                      "смена не поддерживается при статической линковке\n");

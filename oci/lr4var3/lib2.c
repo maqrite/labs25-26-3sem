@@ -13,14 +13,14 @@ float sin_integral(float a, float b, float e) {
   return sum * e;
 }
 
-float pi(int k) {
-  float product = 1.0;
+int gcd(int a, int b) {
+  int min_val = (a < b) ? a : b;
 
-  for (int i = 1; i <= k; ++i) {
-    float num = 4.0 * i * i;
-    float den = 4.0 * i * i - 1;
-    product *= (num / den);
+  for (int i = min_val; i > 0; i--) {
+    if (a % i == 0 && b % i == 0) {
+      return i;
+    }
   }
 
-  return 2 * product;
+  return 1;
 }

@@ -10,12 +10,12 @@ float sin_integral(float a, float b, float e) {
   return sum;
 }
 
-float pi(int k) {
-  float sum = 0.0;
-  for (int i = 0; i < k; ++i) {
-    float term = (i % 2 == 0 ? 1.0 : -1.0) / (2 * i + 1);
-    sum += term;
+int gcd(int a, int b) {
+  while (b != 0) {
+    int temp = b;
+    b = a % b;
+    a = temp;
   }
 
-  return 4 * sum;
+  return a;
 }

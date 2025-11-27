@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 typedef float (*sin_integral_func)(float, float, float);
-typedef float (*pi_func)(int);
+typedef int (*gcd_func)(int, int);
 
 int main(void) {
   char buffer[128];
@@ -17,7 +17,7 @@ int main(void) {
 
   void *handle = NULL;
   sin_integral_func sin_integral = NULL;
-  pi_func pi = NULL;
+  gcd_func gcd = NULL;
 
   handle = dlopen(lib_paths[current_lib], RTLD_LAZY);
   if (!handle) {
@@ -28,9 +28,9 @@ int main(void) {
   }
 
   sin_integral = (sin_integral_func)dlsym(handle, "sin_integral");
-  pi = (pi_func)dlsym(handle, "pi");
+  gcd = (gcd_func)dlsym(handle, "gcd");
 
-  if (!sin_integral || !pi) {
+  if (!sin_integral || !gcd) {
     int len =
         snprintf(out_buffer, sizeof(out_buffer), "ошибка загрузки символов\n");
     write(STDOUT_FILENO, out_buffer, len);
@@ -63,7 +63,7 @@ int main(void) {
       }
 
       sin_integral = (sin_integral_func)dlsym(handle, "sin_integral");
-      pi = (pi_func)dlsym(handle, "pi");
+      gcd = (gcd_func)dlsym(handle, "gcd");
 
       len = snprintf(out_buffer, sizeof(out_buffer), "изменено на: %s\n",
                      lib_paths[current_lib]);
@@ -78,12 +78,11 @@ int main(void) {
         write(STDOUT_FILENO, out_buffer, len);
       }
     } else if (cmd == 2) {
-      int k;
+      int a, b;
 
-      if (sscanf(buffer, "%*d %d", &k) == 1) {
-        float res = pi(k);
-        len = snprintf(out_buffer, sizeof(out_buffer), "резултат (пи): %f\n",
-                       res);
+      if (sscanf(buffer, "%*d %d %d", &a, &b) == 2) {
+        int res = gcd(a, b);
+        len = snprintf(out_buffer, sizeof(buffer), "результат НОД: %d\n", res);
         write(STDOUT_FILENO, out_buffer, len);
       }
     }

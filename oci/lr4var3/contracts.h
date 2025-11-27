@@ -3,6 +3,6 @@
 
 float sin_integral(float a, float b, float e);
 
-float pi(int k);
+int gcd(int a, int b);
 
 #endif
