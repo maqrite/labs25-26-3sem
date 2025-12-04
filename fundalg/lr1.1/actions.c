@@ -118,7 +118,7 @@ long int StringToNumber(const char *string, char **endptr, int base) {
   return number;
 }
 
-void PrintExceptions(const StatusCode status) {
+void PrintErrors(const StatusCode status) {
   switch (status) {
 
   case INVALID_NUMBER_OF_ARGS:

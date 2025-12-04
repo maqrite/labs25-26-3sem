@@ -22,6 +22,6 @@ bool FlagFirstElementCheck(const char element);
 void PrintMultiples(const long int x);
 void PrintHexDigits(const long int x);
 void PrintPowersTable(const long int x);
-void PrintExceptions(const StatusCode status);
+void PrintErrors(const StatusCode status);
 
 #endif

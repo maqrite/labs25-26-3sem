@@ -3,14 +3,14 @@
 int main(int argc, char *argv[]) {
 
   if (argc != 3) {
-    PrintExceptions(INVALID_NUMBER_OF_ARGS);
+    PrintErrors(INVALID_NUMBER_OF_ARGS);
     return INVALID_NUMBER_OF_ARGS;
   }
 
   char firstElement = argv[2][0];
 
   if (!FlagFirstElementCheck(firstElement)) {
-    PrintExceptions(UNKNOWN_FLAG);
+    PrintErrors(UNKNOWN_FLAG);
     return UNKNOWN_FLAG;
   }
 
@@ -20,19 +20,19 @@ int main(int argc, char *argv[]) {
   long int number = StringToNumber(argv[1], &pEnd, base);
 
   if (pEnd == argv[1] || *pEnd != '\0' || number <= 0) {
-    PrintExceptions(INCORRECT_NUMBER);
+    PrintErrors(INCORRECT_NUMBER);
     return INCORRECT_NUMBER;
   }
 
   if ((strcmp(argv[2], "-e") == 0 || strcmp(argv[2], "/e") == 0) &&
       number > 10) {
-    PrintExceptions(INCORRECT_NUMBER_FOR_FLAG);
+    PrintErrors(INCORRECT_NUMBER_FOR_FLAG);
     return INCORRECT_NUMBER_FOR_FLAG;
   }
 
   if ((strcmp(argv[2], "-f") == 0 || strcmp(argv[2], "/f") == 0) &&
       number > 20) {
-    PrintExceptions(INCORRECT_NUMBER_FOR_FLAG);
+    PrintErrors(INCORRECT_NUMBER_FOR_FLAG);
     return INCORRECT_NUMBER_FOR_FLAG;
   }
 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     printf("%ld! = %lld\n", number, factorial);
 
   } else {
-    PrintExceptions(UNKNOWN_FLAG);
+    PrintErrors(UNKNOWN_FLAG);
     return UNKNOWN_FLAG;
   }
 
