@@ -1,6 +1,10 @@
 #include "actions.h"
 
+// X -flag
 int main(int argc, char *argv[]) {
+
+  // argc -> кол-во аргументов  argv[] -> массив c cамими аргументами
+  // argc >= 1 всегда. тк argv[0] - название исполняемого файла
 
   if (argc != 3) {
     PrintErrors(INVALID_NUMBER_OF_ARGS);
@@ -15,7 +19,7 @@ int main(int argc, char *argv[]) {
   }
 
   const int base = 10;
-  char *pEnd;
+  char *pEnd; // strtol.  ->742723. -> \0
 
   long int number = StringToNumber(argv[1], &pEnd, base);
 
