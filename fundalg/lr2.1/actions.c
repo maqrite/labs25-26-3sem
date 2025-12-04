@@ -33,7 +33,12 @@ long long gcd(long long a, long long b) {
   }
   return a;
 }
-
+// 0.2.     -> N->inf or not???????
+// 0.1 -> lambda nom / lambda denom -> nom(1) / denom(10) 1/10 -> if denom[i] [2
+// 5 10]  2 - 2 => дробь представима в этой сс   осc - 6 -> [2 3]
+// если в множество делителей знаменателя дроби имеет хотя бы одно пересечение с
+// множеством делителей основания сс то такая дробь представима в этой сс, если
+// нет, то бесконечная
 bool hasFinReprImpl(double fraction, const int base) {
   const long long maxDenominator = 1000000000000000LL;
   long long denominator = 1;

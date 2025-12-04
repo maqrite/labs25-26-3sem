@@ -60,6 +60,10 @@ StatusCode findPrimeBasedOnSequenceNumber(const int n, long long int *answer) {
   int counter = 1;
   long long int number = 3;
 
+  // counter - счетчик простых чисел
+  // можно было решето эратосфена нагенерить простых чисел (но там жоска нада
+  // была бы выделять память а я тупое чмо)
+
   while (counter < n) {
 
     if (isPrime(number)) {
